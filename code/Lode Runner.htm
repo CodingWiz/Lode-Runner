@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="fr" xml:lang="fr">
+  <head>
+  
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Lode Runner par Andrew Chedid et Mohamed H. Guelleh</title>
+    <link rel="stylesheet" type="text/css" href="" />
+
+    <script type="text/javascript">
+      function sprite (options) {
+          
+          var img = {};
+          /*frameIndex = 0,
+          tickCount = 0,
+          ticksPerFrame = options.ticksPerFrame || 0;*/
+                
+          img.context = options.context;
+          img.width = options.width;
+          img.height = options.height;
+          img.image = options.image;
+
+          img.render = function () {
+            // Draw the animation
+            img.context.drawImage(img.image, 0, 0, img.width, img.height, 0, 0, img.width, img.height);
+          };
+
+          /*img.update = function () {
+            tickCount += 1;
+
+            if (tickCount > ticksPerFrame) {
+              tickCount = 0;
+
+                // Go to the next frame
+                frameIndex += 1; 
+            }
+          }; */
+      
+          return img;
+      }
+
+      function initLoadRunner() {
+        var objCanvas = document.getElementById('monCanvas'),
+            objC2D = objCanvas.getContext('2d');
+
+        objCanvas.focus();
+        
+        var width = objCanvas.width, 
+            height = objCanvas.height;
+        
+        var imgTest = new Image();
+        imgTest.src = "https://cdn.codeandweb.com/blog/2016/05/10/how-to-create-a-sprite-sheet/spritestrip.png";
+
+        var test = sprite({
+          context: objC2D,
+          width: 256,
+          height: 256,
+          image: imgTest
+        });
+        
+        test.render();
+      }
+    </script>
+  </head>
+  
+  
+  <body onload="initLoadRunner()"> 
+    <canvas id="monCanvas" width="1440" height="1088" tabIndex="1" onkeydown="";>
+      Votre navigateur ne supporte pas la balise canvas
+    </canvas>
+  </body>
+</html>
