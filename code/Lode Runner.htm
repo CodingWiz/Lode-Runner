@@ -8,12 +8,13 @@
     <link rel="stylesheet" type="text/css" href="" />
 
     <script type="text/javascript">
-      function sprite (options) {
+      /*function strSprite (options) {
           
           var img = {};
-          /*frameIndex = 0,
+          frameIndex = 0,
           tickCount = 0,
-          ticksPerFrame = options.ticksPerFrame || 0;*/
+          ticksPerFrame = 0;
+          numberOfFrames = options.numberOfFrames || 1;
                 
           img.context = options.context;
           img.width = options.width;
@@ -22,19 +23,26 @@
 
           img.render = function () {
             // Draw the animation
-            img.context.drawImage(img.image, 0, 0, img.width, img.height, 0, 0, img.width, img.height);
+            img.context.drawImage(img.image, frameIndex * img.width / numberOfFrames, 0, img.width / numberOfFrames, img.height, 0, 0, img.width / numberOfFrames, img.height);
           };
 
-          /*img.update = function () {
+          img.loop = options.loop;
+
+          img.update = function () {
             tickCount += 1;
 
             if (tickCount > ticksPerFrame) {
               tickCount = 0;
 
-                // Go to the next frame
-                frameIndex += 1; 
+              // If the current frame index is in range
+              if (frameIndex < numberOfFrames - 1) {	
+                  // Go to the next frame
+                  frameIndex += 1;
+              }	else if (img.loop) {
+                frameIndex = 0;
+              }
             }
-          }; */
+          };
       
           return img;
       }
@@ -51,20 +59,159 @@
         var imgTest = new Image();
         imgTest.src = "https://cdn.codeandweb.com/blog/2016/05/10/how-to-create-a-sprite-sheet/spritestrip.png";
 
-        var test = sprite({
+        var test = strSprite({
           context: objC2D,
           width: 256,
           height: 256,
           image: imgTest
         });
+
+        window.requestAnimationFrame(initLoadRunner);
         
+        test.update();
         test.render();
+
+        // Start the game loop as soon as the strSprite sheet is loaded
+        test.addEventListener("load", initLoadRunner);
+      }*/
+
+      /*function gameLoop () {
+        window.requestAnimationFrame(initLoadRunner);
+
+        coin.update();
+        coin.render();
+      }*/
+
+      
+      
+
+      // variables constantes
+      const intNiveau_1 = 1, intNiveau_2 = 2, intNiveau_3 = 3;
+      const intNum_Cell_X = 28, intNum_Cell_Y = 17;
+
+      /* legende de la carte du niveau : 
+          $ = or
+          @ = Joueur
+          ! = garde
+          H = escalier
+          | = escalier final
+          - = corde
+          # = passerelle de brique
+          ~ = sol
+            = vide
+      */
+     // array qui contient les cartes des differents niveau
+      const arrNiveau_Map = [ 
+        "                  |         " + // carte du niveau 1
+        "    $             |         " +
+        "#######H#######   |         " +
+        "       H----------|    $    " +
+        "       H    ##H   #######H##" +
+        "       H    ##H          H  " +
+        "     ! H    ##H       $! H  " +
+        "##H#####    ########H#######" +
+        "  H                 H       " +
+        "  H           !     H       " +
+        "#########H##########H       " +
+        "         H          H       " +
+        "       $ H----------H   $   " +
+        "    H######         #######H" +
+        "    H         @  $         H" +
+        "############################" + 
+        "~~~~~~~~~~~~~~~~~~~~~~~~~~~~" 
+      ];
+      const strSprite_Or = "", 
+            strSprite_Joueur = "", 
+            strSprite_Garde = "", 
+            strSprite_Escalier = "", 
+            strSprite_Escalier_Final = "", 
+            strSprite_Corde = "", 
+            strSprite_Brique = "", 
+            strSprite_Sol = "",
+            strSprite_Vide = "", ;
+
+      // variables globales
+      var objJoueur = null, // lode runner que le Joueur controle
+          objMap = [[]], // representation des cellules dans un tableau en 2d
+          intNiveau_Courant = intNiveau_1; // niveau courant du joueur
+
+      // remettre les variables globales aux valeurs par defaut
+      function remettreVariables() {
+        objJoueur = null;
+        objMap = [[]];
+        intNiveau_Courant = intNiveau_1;
+      }
+
+      // construire le niveau
+      function construireNiveau(niveau) {
+        //objMap = [[]];
+        var intNiveau_Charactere_Count = 0; // retourne le charactere aux positions (x,y) du niveau
+
+        for (var x = 0; x < intNum_Cell_X; x++) { // parcours les cellules horizontales
+          // https://stackoverflow.com/questions/966225/how-can-i-create-a-two-dimensional-array-in-javascript
+          objMap[x] = []; // genere une erreure si on ne mets pas ca --> you have to set myArray[1]=[]; before assigning myArray[1][0]=5;
+
+          for (var y = 0; y < intNum_Cell_Y; y++) { // parcours les cellues verticales
+            objMap[x][y] = {}; // cree un nouveau objet aux coordonnees (x,y)
+
+            // retourne le charactere aux positions (x,y) du niveau
+            var strNiveau_Charactere = niveau.charAt(intNiveau_Charactere_Count++);
+            objMap[x][y].strType = strNiveau_Charactere;
+
+            switch(strNiveau_Charactere) {
+              /* legende de la carte du niveau : 
+                  $ = or
+                  @ = Joueur
+                  ! = garde
+                  H = escalier
+                  | = escalier final
+                  - = corde
+                  # = passerelle de brique
+                  ~ = sol
+                    = vide
+              */
+              case "$": objMap[x][y].strSprite = strSprite_Or; break;
+              case "@": objMap[x][y].strSprite = strSprite_Joueur; break;
+              case "!": objMap[x][y].strSprite = strSprite_Garde; break;
+              case "H": objMap[x][y].strSprite = strSprite_Escalier; break;
+              case "|": objMap[x][y].strSprite = strSprite_Escalier_Final; break;
+              case "-": objMap[x][y].strSprite = strSprite_Corde; break;
+              case "#": objMap[x][y].strSprite = strSprite_Brique; break;
+              case "~": objMap[x][y].strSprite = strSprite_Sol; break;
+              case " ": objMap[x][y].strSprite = strSprite_Vide; break;
+            }
+          }
+        }
+
+        /*var niveau_Charactere = 0;
+        for (var x = 0; x < intNum_Cell_X; x++) { // parcours les cellules horizontales
+          for (var y = 0; y < intNum_Cell_Y; y++) { // parcours les cellues verticales
+            switch(niveau.charAt(niveau_Charactere++)) { // retourne le charactere aux positions (x,y) du niveau
+
+            }
+          }
+        }*/
+      }
+
+      function initLodeRunner() { // demarre le jeu
+        // variables canvas 
+        var objCanvas = document.getElementById('monCanvas'),
+          objC2D = objCanvas.getContext('2d');
+
+        objCanvas.focus();
+        
+        var canvas_Width = objCanvas.width, 
+            canvas_Height = objCanvas.height;
+
+        
+        remettreVariables();
+        construireNiveau(arrNiveau_Map[intNiveau_Courant-1]);
       }
     </script>
   </head>
   
   
-  <body onload="initLoadRunner()"> 
+  <body onload="initLodeRunner()"> 
     <canvas id="monCanvas" width="1440" height="1088" tabIndex="1" onkeydown="";>
       Votre navigateur ne supporte pas la balise canvas
     </canvas>
