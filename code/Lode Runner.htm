@@ -100,7 +100,7 @@
           ~ = sol
             = vide
       */
-     // array qui contient les cartes des differents niveau
+     // array constante globale qui contient les cartes des differents niveau
       const arrNiveau_Map = [ 
         "                  |         " + // carte du niveau 1
         "    $             |         " +
@@ -120,26 +120,88 @@
         "############################" + 
         "~~~~~~~~~~~~~~~~~~~~~~~~~~~~" 
       ];
+      // constantes globales qui contiennent les photos/sprites
       const strSprite_Or = "", 
-            strSprite_Joueur = "", 
+            strSprite_Joueur = "joueur test", 
             strSprite_Garde = "", 
             strSprite_Escalier = "", 
             strSprite_Escalier_Final = "", 
             strSprite_Corde = "", 
             strSprite_Brique = "", 
             strSprite_Sol = "",
-            strSprite_Vide = "", ;
+            strSprite_Vide = "";
 
       // variables globales
+      var objStage = null; // stage qui contient tous les enfants a dessiner et a mettre dans le jeu
+      var objSprite_Sheet = null;
+
       var objJoueur = null, // lode runner que le Joueur controle
-          objMap = [[]], // representation des cellules dans un tableau en 2d
-          intNiveau_Courant = intNiveau_1; // niveau courant du joueur
+          objMap = null, // representation des cellules dans un tableau array en 2d
+          intNiveau_Courant = 0, // niveau courant du joueur
+          intOr_Count = 0, // compte le nombre d'or qu'il y a dans le jeu
+          intGarde_Count = 0; // compte le nombre de garde qu'il y a dans le jeu
+
+      var RUNNER_SPEED = 0.65;
+      var BASE_TILE_X = 40,
+	        BASE_TILE_Y = 44;
+
 
       // remettre les variables globales aux valeurs par defaut
-      function remettreVariables() {
-        objJoueur = null;
+      function remettreVariables(objCanvas) {
+        // redefini la fonction stage et le met dans la variable objStage
+        objStage = stage({ 
+          name: "Main stage",
+          canvas: objCanvas,
+          toString: function() {
+            return "[Stage  (name = "+  this.name +")]";
+          }
+        });
+
+        // redefini la fonction joueur et le met dans la variable objJoueur
+        objJoueur = joueur({
+        });
+
+        objSprite_Sheet = spriteSheet({
+          images: [runnerImage],
+		
+          frames: {
+            regX:0, 
+            height: BASE_TILE_Y,  
+            regY:0, 
+            width: BASE_TILE_X
+          },
+          
+          animations: { 
+            runRight: [0,2, "runRight", RUNNER_SPEED], 
+            runLeft : [3,5, "runLeft",  RUNNER_SPEED], 
+            runUpDn : [6,7, "runUpDn",  RUNNER_SPEED],
+
+            barRight: {
+              frames: [ 18, 19, 19, 20, 20 ],
+              next:  "barRight",
+              speed: RUNNER_SPEED
+            },
+
+            barLeft: {
+              frames: [ 21, 22, 22, 23, 23 ],
+              next:  "barLeft",
+              speed: RUNNER_SPEED
+            },
+                
+            digRight: 24,
+            digLeft : 25,
+
+            fallRight : 8,
+            fallLeft: 26
+          }
+        });
+
         objMap = [[]];
-        intNiveau_Courant = intNiveau_1;
+
+        intNiveau_Courant = intNiveau_1; // niveau 1 par defaut
+
+        intOr_Count = 0;
+        intGarde_Count = 0;
       }
 
       // construire le niveau
@@ -157,6 +219,7 @@
             // retourne le charactere aux positions (x,y) du niveau
             var strNiveau_Charactere = niveau.charAt(intNiveau_Charactere_Count++);
             objMap[x][y].strType = strNiveau_Charactere;
+            objStage.addChild(strNiveau_Charactere);
 
             switch(strNiveau_Charactere) {
               /* legende de la carte du niveau : 
@@ -170,18 +233,60 @@
                   ~ = sol
                     = vide
               */
-              case "$": objMap[x][y].strSprite = strSprite_Or; break;
-              case "@": objMap[x][y].strSprite = strSprite_Joueur; break;
-              case "!": objMap[x][y].strSprite = strSprite_Garde; break;
-              case "H": objMap[x][y].strSprite = strSprite_Escalier; break;
-              case "|": objMap[x][y].strSprite = strSprite_Escalier_Final; break;
-              case "-": objMap[x][y].strSprite = strSprite_Corde; break;
-              case "#": objMap[x][y].strSprite = strSprite_Brique; break;
-              case "~": objMap[x][y].strSprite = strSprite_Sol; break;
-              case " ": objMap[x][y].strSprite = strSprite_Vide; break;
+              case "$": 
+                objMap[x][y].strSprite = strSprite_Or; 
+                intOr_Count++; 
+
+                break;
+              case "@": 
+                objMap[x][y].strSprite = objJoueur.strSprite = strSprite_Joueur; 
+                break;
+              case "!": 
+                objMap[x][y].strSprite = strSprite_Garde; 
+                intGarde_Count++; 
+
+                break;
+              case "H": 
+                objMap[x][y].strSprite = strSprite_Escalier; 
+
+                break;
+              case "|": 
+                objMap[x][y].strSprite = strSprite_Escalier_Final; 
+
+                break;
+              case "-": 
+                objMap[x][y].strSprite = strSprite_Corde; 
+
+                break;
+              case "#": 
+                objMap[x][y].strSprite = strSprite_Brique; 
+
+                break;
+              case "~": 
+                objMap[x][y].strSprite = strSprite_Sol; 
+
+                break;
+              case " ": 
+                objMap[x][y].strSprite = strSprite_Vide; 
+
+                break;
             }
           }
         }
+
+        /*console.log(objStage.children);
+        console.log(objStage.getNumChildren());
+        console.log(objStage.getChildIndex("@"));
+        console.log(objStage.getChildAt(406));
+
+        objStage.removeChild("@");
+
+        console.log(objStage.children);
+        console.log(objStage.getNumChildren());
+        console.log(objStage.getChildIndex("@"));
+        console.log(objStage.getChildAt(406));*/
+
+        //console.log(objJoueur.strSprite);
 
         /*var niveau_Charactere = 0;
         for (var x = 0; x < intNum_Cell_X; x++) { // parcours les cellules horizontales
@@ -202,10 +307,182 @@
         
         var canvas_Width = objCanvas.width, 
             canvas_Height = objCanvas.height;
-
         
-        remettreVariables();
+        remettreVariables(objCanvas);
         construireNiveau(arrNiveau_Map[intNiveau_Courant-1]);
+      }
+
+      // fonction stage qui initialise l'objet stage et elle est redefinie par celui-ci a chaque fois qu'on appelle la fonction remettreVariable()
+      function stage() {
+        // objet qui est retourne par la fonction
+        var object_Stage = {};
+
+        object_Stage.name = null;
+
+        object_Stage.canvas = null;
+
+        object_Stage.drawRect = null;
+
+        object_Stage.children = [];
+        
+        object_Stage.getChildAt = function(index) {
+          return this.children[index];
+        };
+        object_Stage.getChildByName = function(name) {
+          var kids = this.children;
+          for (var i=0,l=kids.length;i<l;i++) {
+            if(kids[i].name == name) { return kids[i]; }
+          }
+          return null;
+        };
+        object_Stage.getChildIndex = function(child) {
+          return this.indexOf(this.children, child);
+        };
+        object_Stage.getNumChildren = function () {
+          return this.children.length;
+        };
+
+        object_Stage.addChild = function(child) {
+          if (child == null) { return child; }
+          var l = arguments.length;
+          if (l > 1) {
+            for (var i=0; i<l; i++) { this.addChild(arguments[i]); }
+            return arguments[l-1];
+          }
+          // Note: a lot of duplication with addChildAt, but push is WAY faster than splice.
+          var par=child.parent, silent = par === this;
+          par&&par._removeChildAt(this.indexOf(par.children, child), silent);
+          child.parent = this;
+          this.children.push(child);
+          //if (!silent) { child.dispatchEvent("added"); }
+          return child;
+        };
+        object_Stage.addChildAt = function(child, index) {
+          var l = arguments.length;
+          var indx = arguments[l-1]; // can't use the same name as the index param or it replaces arguments[1]
+          if (indx < 0 || indx > this.children.length) { return arguments[l-2]; }
+          if (l > 2) {
+            for (var i=0; i<l-1; i++) { this.addChildAt(arguments[i], indx+i); }
+            return arguments[l-2];
+          }
+          var par=child.parent, silent = par === this;
+          par&&par._removeChildAt(this.indexOf(par.children, child), silent);
+          child.parent = this;
+          this.children.splice(index, 0, child);
+          //if (!silent) { child.dispatchEvent("added"); }
+          return child;
+        };
+
+        object_Stage._removeChildAt = function(index, silent) {
+          if (index < 0 || index > this.children.length-1) { return false; }
+          var child = this.children[index];
+          if (child) { child.parent = null; }
+          this.children.splice(index, 1);
+          //if (!silent) { child.dispatchEvent("removed"); }
+          return true;
+        };
+        object_Stage.removeChild = function(child) {
+          var l = arguments.length;
+          if (l > 1) {
+            var good = true;
+            for (var i=0; i<l; i++) { good = good && this.removeChild(arguments[i]); }
+            return good;
+          }
+          return this._removeChildAt(this.indexOf(this.children, child));
+        };
+        object_Stage.removeChildAt = function(index) {
+          var l = arguments.length;
+          if (l > 1) {
+            var a = [];
+            for (var i=0; i<l; i++) { a[i] = arguments[i]; }
+            a.sort(function(a, b) { return b-a; });
+            var good = true;
+            for (var i=0; i<l; i++) { good = good && this._removeChildAt(a[i]); }
+            return good;
+          }
+          return this._removeChildAt(index);
+        };
+        object_Stage.removeAllChildren = function() {
+          var kids = this.children;
+          while (kids.length) { this._removeChildAt(0); }
+        };
+
+        object_Stage.sortChildren = function(sortFunction) {
+          this.children.sort(sortFunction);
+        };
+
+        /*clone: function(recursive) {
+          var o = this._cloneProps(new Container());
+          if (recursive) { this._cloneChildren(o); }
+          return o;
+        },*/
+        
+        object_Stage.toString = null;
+
+        object_Stage.isVisible = function() {
+          var hasContent = this.cacheCanvas || this.children.length;
+          return !!(this.visible && this.alpha > 0 && this.scaleX != 0 && this.scaleY != 0 && hasContent);
+        };
+        object_Stage.draw = function(ctx, ignoreCache) {
+          if (this.DisplayObject_draw(ctx, ignoreCache)) { return true; }
+          
+          // this ensures we don't have issues with display list changes that occur during a draw:
+          var list = this.children.slice();
+          for (var i=0,l=list.length; i<l; i++) {
+            var child = list[i];
+            if (!child.isVisible()) { continue; }
+            
+            // draw the child:
+            ctx.save();
+            child.updateContext(ctx);
+            child.draw(ctx);
+            ctx.restore();
+          }
+          return true;
+        };
+
+        object_Stage.mouseChildren = true;
+        object_Stage.tickChildren = true;
+
+        object_Stage.clear = function() {
+          if (!this.canvas) { return; }
+          var ctx = this.canvas.getContext("2d");
+          ctx.setTransform(1, 0, 0, 1, 0, 0);
+          ctx.clearRect(0, 0, this.canvas.width+1, this.canvas.height+1);
+        };
+
+        object_Stage.indexOf = function (array, searchElement){          
+          for (var i = 0, l=array.length; i < l; i++) {
+            if (searchElement === array[i]) {
+              return i;
+            }
+          }
+          return -1;
+        };
+
+        return object_Stage;
+      }
+
+      // fonction stage qui initialise l'objet joueur et elle est redefinie par celui-ci a chaque fois qu'on appelle la fonction remettreVariable()
+      function joueur() {
+        // objet qui est retourne par la fonction
+        var object_Joueur = {};
+
+        object_Joueur.strSprite = null;
+
+        return object_Joueur;
+      }
+
+      function spriteSheet() {
+        var object_SpriteSheet = {};
+
+        object_SpriteSheet.images = null;
+
+        object_SpriteSheet.frames = null;
+
+        object_SpriteSheet.animations = null;
+
+        return object_SpriteSheet;
       }
     </script>
   </head>
