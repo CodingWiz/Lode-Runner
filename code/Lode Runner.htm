@@ -7,6 +7,8 @@
     <title>Lode Runner par Andrew Chedid et Mohamed H. Guelleh</title>
     <link rel="stylesheet" type="text/css" href="" />
 
+    <script type="text/javascript" src="Graphics.js"></script>
+
     <script type="text/javascript">
       /*function strSprite (options) {
           
@@ -132,6 +134,8 @@
             strSprite_Vide = "";
 
       // variables globales
+      var objCanvas = null;
+
       var objStage = null; // stage qui contient tous les enfants a dessiner et a mettre dans le jeu
       var objSprite_Sheet = null;
 
@@ -147,22 +151,21 @@
 
 
       // remettre les variables globales aux valeurs par defaut
-      function remettreVariables(objCanvas) {
+      function remettreVariables() {
         // redefini la fonction stage et le met dans la variable objStage
-        objStage = stage({ 
+        objStage = object_Stage({ 
           name: "Main stage",
-          canvas: objCanvas,
           toString: function() {
             return "[Stage  (name = "+  this.name +")]";
           }
         });
 
         // redefini la fonction joueur et le met dans la variable objJoueur
-        objJoueur = joueur({
+        objJoueur = object_Joueur({
         });
 
-        objSprite_Sheet = spriteSheet({
-          images: [runnerImage],
+        objSprite_Sheet = object_SpriteSheet({
+          /*images: [runnerImage],
 		
           frames: {
             regX:0, 
@@ -193,7 +196,7 @@
 
             fallRight : 8,
             fallLeft: 26
-          }
+          }*/
         });
 
         objMap = [[]];
@@ -300,7 +303,7 @@
 
       function initLodeRunner() { // demarre le jeu
         // variables canvas 
-        var objCanvas = document.getElementById('monCanvas'),
+        objCanvas = document.getElementById('monCanvas'),
           objC2D = objCanvas.getContext('2d');
 
         objCanvas.focus();
@@ -308,18 +311,28 @@
         var canvas_Width = objCanvas.width, 
             canvas_Height = objCanvas.height;
         
-        remettreVariables(objCanvas);
+        remettreVariables();
+
+        background();
+
         construireNiveau(arrNiveau_Map[intNiveau_Courant-1]);
+
+        //objStage.update();
       }
 
       // fonction stage qui initialise l'objet stage et elle est redefinie par celui-ci a chaque fois qu'on appelle la fonction remettreVariable()
-      function stage() {
+      function object_Stage() {
         // objet qui est retourne par la fonction
         var object_Stage = {};
 
         object_Stage.name = null;
+        object_Stage.toString = null;
 
-        object_Stage.canvas = null;
+        // ??????????????????????????????
+        object_Stage.mouseChildren = true;
+        object_Stage.tickChildren = true;
+
+        object_Stage.canvas = objCanvas;
 
         object_Stage.drawRect = null;
 
@@ -416,36 +429,37 @@
           if (recursive) { this._cloneChildren(o); }
           return o;
         },*/
-        
-        object_Stage.toString = null;
 
         object_Stage.isVisible = function() {
           var hasContent = this.cacheCanvas || this.children.length;
           return !!(this.visible && this.alpha > 0 && this.scaleX != 0 && this.scaleY != 0 && hasContent);
         };
         object_Stage.draw = function(ctx, ignoreCache) {
-          if (this.DisplayObject_draw(ctx, ignoreCache)) { return true; }
+          if (this.DisplayObject_draw(ctx, ignoreCache)) { 
+            return true; 
+          }
           
           // this ensures we don't have issues with display list changes that occur during a draw:
           var list = this.children.slice();
           for (var i=0,l=list.length; i<l; i++) {
             var child = list[i];
-            if (!child.isVisible()) { continue; }
+            if (!child.isVisible()) { 
+              continue; 
+            }
             
             // draw the child:
             ctx.save();
-            child.updateContext(ctx);
+            //child.updateContext(ctx);
             child.draw(ctx);
             ctx.restore();
           }
           return true;
         };
 
-        object_Stage.mouseChildren = true;
-        object_Stage.tickChildren = true;
-
         object_Stage.clear = function() {
-          if (!this.canvas) { return; }
+          if (!this.canvas) { 
+            return; 
+          }
           var ctx = this.canvas.getContext("2d");
           ctx.setTransform(1, 0, 0, 1, 0, 0);
           ctx.clearRect(0, 0, this.canvas.width+1, this.canvas.height+1);
@@ -460,11 +474,45 @@
           return -1;
         };
 
+        object_Stage.update = function(props) {
+          if (!this.canvas) { 
+            return; 
+          }
+          if (this.tickOnUpdate) { 
+            this.tick(props); 
+          }
+          /*if (this.dispatchEvent("drawstart", false, true) === false) { 
+            console.log("Test 3");
+            return; 
+          }*/
+          //createjs.DisplayObject._snapToPixelEnabled = this.snapToPixelEnabled;
+          var r = this.drawRect, ctx = this.canvas.getContext("2d");
+          ctx.setTransform(1, 0, 0, 1, 0, 0);
+          if (this.autoClear) {
+            if (r) { 
+              ctx.clearRect(r.x, r.y, r.width, r.height); 
+            }
+            else { 
+              ctx.clearRect(0, 0, this.canvas.width+1, this.canvas.height+1); 
+            }
+          }
+          ctx.save();
+          if (this.drawRect) {
+            ctx.beginPath();
+            ctx.rect(r.x, r.y, r.width, r.height);
+            ctx.clip();
+          }
+          //this.updateContext(ctx);
+          this.draw(ctx, false);
+          ctx.restore();
+          //this.dispatchEvent("drawend");
+        };
+
         return object_Stage;
       }
 
       // fonction stage qui initialise l'objet joueur et elle est redefinie par celui-ci a chaque fois qu'on appelle la fonction remettreVariable()
-      function joueur() {
+      function object_Joueur() {
         // objet qui est retourne par la fonction
         var object_Joueur = {};
 
@@ -473,7 +521,7 @@
         return object_Joueur;
       }
 
-      function spriteSheet() {
+      function object_SpriteSheet() {
         var object_SpriteSheet = {};
 
         object_SpriteSheet.images = null;
@@ -483,6 +531,40 @@
         object_SpriteSheet.animations = null;
 
         return object_SpriteSheet;
+      }
+
+      function background() {
+        var background = object_Shape({
+
+        });
+
+        background.graphics.beginFill("#000000").drawRect(0, 0, canvas.width, canvas.height);
+        objStage.addChild(background);
+        document.body.style.background = "#250535";
+      }
+
+      function object_Shape() {
+        var object_Shape = {};
+
+        object_Shape.graphics = new graphics();
+
+        object_Shape.isVisible = function() {
+          var hasContent = this.cacheCanvas || (this.graphics && !this.graphics.isEmpty());
+          return !!(this.visible && this.alpha > 0 && this.scaleX != 0 && this.scaleY != 0 && hasContent);
+        };
+
+        object_Shape.draw = function(ctx, ignoreCache) {
+          if (this.DisplayObject_draw(ctx, ignoreCache)) { return true; }
+          this.graphics.draw(ctx, this);
+          return true;
+        };
+
+        object_Shape.clone = function(recursive) {
+          var g = (recursive && this.graphics) ? this.graphics.clone() : this.graphics;
+          return  this._cloneProps(new Shape(g));
+        };
+
+        return object_Shape;
       }
     </script>
   </head>
