@@ -4,7 +4,7 @@
   <head>
   
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Lode Runner par Andrew Chedid et Mohamed H. Guelleh</title>
+    <title>Lode Runner par Mohamed H. Guelleh & Andrew Chedid</title>
     <link rel="stylesheet" type="text/css" href="" />
 
     <script type="text/javascript" src="Graphics.js"></script>
@@ -208,17 +208,26 @@
         // retourne le charactere aux positions (x,y) du niveau
         var intNiveau_Charactere_Count = 0; 
 
-        for (var y = 0; y < intNum_Cell_Y; y++) { // parcours les cellules horizontales
+        // parcours les cellules horizontales
+        for (var y = 0; y < intNum_Cell_Y; y++) { 
           // https://stackoverflow.com/questions/966225/how-can-i-create-a-two-dimensional-array-in-javascript
-          //objMap[x] = []; // genere une erreure si on ne mets pas ca --> you have to set myArray[1]=[]; before assigning myArray[1][0]=5;
+          // genere une erreure si on ne mets pas ca --> you have to set myArray[1]=[]; before assigning myArray[1][0]=5;
+          //objMap[x] = []; 
 
-          for (var x = 0; x < intNum_Cell_X; x++) { // parcours les cellues verticales
-            //objMap[x][y] = {}; // cree un nouveau objet aux coordonnees (x,y)
+          // parcours les cellues verticales
+          for (var x = 0; x < intNum_Cell_X; x++) { 
+          // cree un nouveau objet aux coordonnees (x,y)
+            //objMap[x][y] = {}; 
 
             // retourne le charactere aux positions (x,y) du niveau
             var strNiveau_Charactere = niveau.charAt(intNiveau_Charactere_Count++);
             
-            var img;
+            var objImage = object_Images({
+            });
+            objImage.strCharactere = strNiveau_Charactere,
+            objImage.intX = x;
+            objImage.intY = y;
+
             switch(strNiveau_Charactere) {
               /* legende de la carte du niveau : 
                   $ = or
@@ -234,46 +243,55 @@
               case "$": 
                 intOr_Count++; 
                 
-                img = initImage(strSprite_Or, x, y);
+                objImage.strSrc = strSprite_Or;
+                //objImage.img = initImage(strSprite_Or, x, y);
 
                 break;
               case "@": 
-                img = objJoueur.img = initImage(strSprite_Joueur, x, y);
+                objImage.strSrc = strSprite_Joueur;
+                //objImage.img = objJoueur.img = initImage(strSprite_Joueur, x, y);
 
                 break;
               case "!":
                 intGarde_Count++; 
 
-                img = initImage(strSprite_Garde, x, y);
+                objImage.strSrc = strSprite_Garde;
+                //objImage.img = initImage(strSprite_Garde, x, y);
 
                 break;
               case "H": 
-                img = initImage(strSprite_Escalier, x, y);
+                objImage.strSrc = strSprite_Escalier;
+                //objImage.img = initImage(strSprite_Escalier, x, y);
 
                 break;
               case "|": 
-                img = initImage(strSprite_Escalier, x, y);
+                objImage.strSrc = strSprite_Escalier;
+                //objImage.img = initImage(strSprite_Escalier, x, y);
 
                 break;
               case "-": 
-                img = initImage(strSprite_Corde, x, y);
+                objImage.strSrc = strSprite_Corde;
+                //objImage.img = initImage(strSprite_Corde, x, y);
 
                 break;
               case "#":
-                img = initImage(strSprite_Brique, x, y);
+                objImage.strSrc = strSprite_Brique;
+                //objImage.img = initImage(strSprite_Brique, x, y);
 
                 break;
               case "~": 
-                img = initImage(strSprite_Sol, x, y);
+                objImage.strSrc = strSprite_Sol;
+                //objImage.img = initImage(strSprite_Sol, x, y);
 
                 break;
               case " ": 
-                img = initImage(strSprite_Vide, x, y);
+                objImage.strSrc = strSprite_Vide;
+                //objImage.img = initImage(strSprite_Vide, x, y);
 
                 break;
             }
 
-            objStage.addChild(img);
+            objStage.addChild(objImage);
           }
         }     
 
@@ -315,7 +333,26 @@
         remettreVariables();
 
         construireNiveau(arrNiveau_Map[intNiveau_Courant-1]);
-        animer();
+        //animer();
+
+        /*objStage.children.forEach(objImage => {
+          if (objImage.getStrCharactere() === "|") {
+            objStage.removeChild(objImage);
+          }
+        });*/
+
+        /*objStage.getImageIndexAt("$");
+        objStage.removeImageIndexAt("$", 17, 14);*/
+
+        objStage.draw();
+
+        objStage.removeAllImageIndex("!");
+
+        objStage.clearDraw();
+
+        //effacerDessin();
+
+        //console.log(objStage.children);
       }
 
       // initialise les images
@@ -324,8 +361,6 @@
         var image = new Image();
         
         image.src = imgSrc;
-        /*image.style.width = (parseInt(image.getAttribute('width')) + 1000) + "px";
-        image.style.height = (parseInt(image.getAttribute('height')) + 1000) + "px";*/
 
         image.onload = function(){
           objC2D.drawImage(image, x*(objCanvas.width/intNum_Cell_X), y*(objCanvas.height/intNum_Cell_Y), 52, 64);
@@ -342,7 +377,8 @@
         // Le cycle d'animation
         effacerDessin();
         mettreAJourAnimation();
-        construireNiveau(arrNiveau_Map[intNiveau_Courant-1]);
+        objStage.draw();
+        //construireNiveau(arrNiveau_Map[intNiveau_Courant-1]);
         //setTimeout(animer, Math.floor(1000/60));
       }
       function effacerDessin() {
@@ -459,6 +495,57 @@
           while (kids.length) { this._removeChildAt(0); }
         };
 
+        object_Stage.getImageIndexAt = function(strCharactere) {
+          this.children.forEach(objImage => {
+            if (objImage.getStrCharactere() === strCharactere) {
+              console.log(objImage.toString());
+            }
+          });
+        };
+        
+        object_Stage.removeImageIndexAt = function(strCharactere, x, y) {
+          var blnTrouve = false,
+              intCount = 0,
+              intX = x,
+              intY = y;
+
+          this.children.forEach(objImage => {
+            if (objImage.getStrCharactere() === strCharactere && objImage.getX() == intX && objImage.getY() == intY) {
+              blnTrouve = true;
+              intCount++;
+
+              this.removeChild(objImage);
+            }
+          });
+
+          if (blnTrouve) {
+            console.log("L'image \"" + strCharactere + "\" a ete enlevee " + intCount + "nb de fois aux coordonnees (" + intX + "x, " + intY + "y)");
+          }
+          else {
+            console.log("L'image \"" + strCharactere + "\" n'a pas ete trouvee aux coordonnees (" + intX + "x, " + intY + "y)");
+          }
+        };
+        object_Stage.removeAllImageIndex = function(strCharactere) {
+          var blnTrouve = false,
+              intCount = 0;
+
+          this.children.forEach(objImage => {
+            if (objImage.getStrCharactere() === strCharactere) {
+              blnTrouve = true;
+              intCount++;
+
+              this.removeChild(objImage);
+            }
+          });
+
+          if (blnTrouve) {
+            console.log("L'image \"" + strCharactere + "\" a ete enlevee " + intCount + "nb de fois");
+          }
+          else {
+            console.log("L'image \"" + strCharactere + "\" n'a pas ete trouvee");
+          }
+        };
+
         object_Stage.sortChildren = function(sortFunction) {
           this.children.sort(sortFunction);
         };
@@ -495,13 +582,15 @@
           return true;
         };*/
 
+        // !!! marche pas !!!
         object_Stage.clear = function() {
           if (!this.canvas) { 
             return; 
           }
           var ctx = this.canvas.getContext("2d");
-          ctx.setTransform(1, 0, 0, 1, 0, 0);
-          ctx.clearRect(0, 0, this.canvas.width+1, this.canvas.height+1);
+          //ctx.setTransform(1, 0, 0, 1, 0, 0);
+          ctx.fillStyle = "white";
+          ctx.fillRect(0, 0, this.canvas.width+1, this.canvas.height+1);
         };
 
         object_Stage.indexOf = function (array, searchElement){          
@@ -511,6 +600,34 @@
             }
           }
           return -1;
+        };
+
+        object_Stage.draw = function() {
+          this.children.forEach(objImage => {
+            var image = new Image();
+        
+            image.src = objImage.getStrSrc();
+
+            image.onload = function(){
+              objC2D.drawImage(image, objImage.getX()*(objCanvas.width/intNum_Cell_X), objImage.getY()*(objCanvas.height/intNum_Cell_Y), 52, 64);
+            }
+
+            objImage.img = image;
+          });
+        };
+        object_Stage.clearDraw = function() {
+          this.children.forEach(objImage => {
+            var image = new Image();
+        
+            image.src = strSprite_Vide;
+
+            image.onload = function(){
+              objC2D.globalCompositeOperation ="xor"
+              objC2D.drawImage(image, objImage.getX()*(objCanvas.width/intNum_Cell_X), objImage.getY()*(objCanvas.height/intNum_Cell_Y), 52, 64);
+            }
+
+            objImage.img = image;
+          });
         };
 
         /*object_Stage.update = function(props) {
@@ -561,6 +678,44 @@
         return object_Joueur;
       }
 
+      function object_Images() {
+        var object_Images = {};
+
+        object_Images.strCharactere = null;
+        object_Images.intX = null;
+        object_Images.intY = null;
+        object_Images.strSrc = null;
+        object_Images.img = null;
+
+        object_Images.toString = function() {
+          return "[\n" + 
+                  "\t" + "Image \n" + 
+                  "\t" + "charactere:\t" + this.strCharactere + ",\n" + 
+                  "\t" + "x:\t" + this.intX + ",\n" + 
+                  "\t" + "y:\t" + this.intY + ",\n" + 
+                  "\t" + "src:\t" + this.strSrc + 
+                  "\n]\n\n";
+        };
+
+        object_Images.getStrCharactere = function() {
+          return this.strCharactere;
+        };
+        object_Images.getX = function() {
+          return this.intX;
+        };
+        object_Images.getY = function() {
+          return this.intY;
+        };
+        object_Images.getStrSrc = function() {
+          return this.strSrc;
+        };
+        object_Images.getImg = function() {
+          return this.img;
+        };
+
+        return object_Images;
+      }
+
       /*function object_SpriteSheet() {
         var object_SpriteSheet = {};
 
@@ -604,7 +759,7 @@
           return  this._cloneProps(new Shape(g));
         };
 
-        return object_Shape;
+        return object_Shape; 
       }*/
     </script>
   </head>
