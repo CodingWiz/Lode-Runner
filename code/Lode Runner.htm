@@ -315,6 +315,7 @@
         remettreVariables();
 
         construireNiveau(arrNiveau_Map[intNiveau_Courant-1]);
+        animer();
       }
 
       // initialise les images
@@ -331,6 +332,30 @@
         }
 
         return image;
+      }
+
+      var objCycleAnimation = null;
+      function animer() {
+        // Requête pour le prochain cycle
+        objCycleAnimation = requestAnimationFrame(animer);
+	
+        // Le cycle d'animation
+        effacerDessin();
+        mettreAJourAnimation();
+        construireNiveau(arrNiveau_Map[intNiveau_Courant-1]);
+        //setTimeout(animer, Math.floor(1000/60));
+      }
+      function effacerDessin() {
+	      objC2D.clearRect(0,0, objCanvas.width, objCanvas.height); 
+      }
+      function mettreAJourAnimation() {
+		    // A programmer
+		    //fltAngleRotation += Math.PI/180;
+      }
+      function arreterAnimation() {
+        if (objCycleAnimation != null)
+            cancelAnimationFrame(objCycleAnimation);	
+        objCycleAnimation = null;
       }
 
       // fonction stage qui initialise l'objet stage et 
