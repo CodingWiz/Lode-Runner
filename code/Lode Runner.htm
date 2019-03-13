@@ -323,8 +323,11 @@
         var image = new Image();
         
         image.src = imgSrc;
+        /*image.style.width = (parseInt(image.getAttribute('width')) + 1000) + "px";
+        image.style.height = (parseInt(image.getAttribute('height')) + 1000) + "px";*/
+
         image.onload = function(){
-          objC2D.drawImage(image, x*(objCanvas.width/intNum_Cell_X), y*(objCanvas.height/intNum_Cell_Y));
+          objC2D.drawImage(image, x*(objCanvas.width/intNum_Cell_X), y*(objCanvas.height/intNum_Cell_Y), 52, 64);
         }
 
         return image;
