@@ -139,25 +139,11 @@
 
       var objStage = null; // stage qui contient tous les enfants a dessiner et a mettre dans le jeu
 
-      // variables globales pour init les images
-      var imgOr = new Image(),
-          imgJoueur = new Image(),
-          imgGarde = new Image(),
-          imgEscalier = new Image(),
-          imgCorde = new Image(),
-          imgBrique = new Image(),
-          imgSol = new Image(),
-          imgVide = new Image();
-
       var objJoueur = null, // lode runner que le Joueur controle
-          objMap = null, // representation des cellules dans un tableau array en 2d
+          //objMap = null, // representation des cellules dans un tableau array en 2d
           intNiveau_Courant = 0, // niveau courant du joueur
           intOr_Count = 0, // compte le nombre d'or qu'il y a dans le jeu
           intGarde_Count = 0; // compte le nombre de garde qu'il y a dans le jeu
-
-      //var RUNNER_SPEED = 0.65;
-      /*var BASE_TILE_X = 40,
-	        BASE_TILE_Y = 44;*/
 
 
       // remettre les variables globales aux valeurs par defaut
@@ -209,7 +195,7 @@
           }
         });*/
 
-        objMap = [[]];
+        //objMap = [[]];
 
         intNiveau_Courant = intNiveau_1; // niveau 1 par defaut
 
@@ -222,23 +208,16 @@
         // retourne le charactere aux positions (x,y) du niveau
         var intNiveau_Charactere_Count = 0; 
 
-        for (var x = 0; x < intNum_Cell_X; x++) { // parcours les cellules horizontales
+        for (var y = 0; y < intNum_Cell_Y; y++) { // parcours les cellules horizontales
           // https://stackoverflow.com/questions/966225/how-can-i-create-a-two-dimensional-array-in-javascript
-          objMap[x] = []; // genere une erreure si on ne mets pas ca --> you have to set myArray[1]=[]; before assigning myArray[1][0]=5;
+          //objMap[x] = []; // genere une erreure si on ne mets pas ca --> you have to set myArray[1]=[]; before assigning myArray[1][0]=5;
 
-          for (var y = 0; y < intNum_Cell_Y; y++) { // parcours les cellues verticales
-            objMap[x][y] = {}; // cree un nouveau objet aux coordonnees (x,y)
+          for (var x = 0; x < intNum_Cell_X; x++) { // parcours les cellues verticales
+            //objMap[x][y] = {}; // cree un nouveau objet aux coordonnees (x,y)
 
             // retourne le charactere aux positions (x,y) du niveau
             var strNiveau_Charactere = niveau.charAt(intNiveau_Charactere_Count++);
-            //strType = strNiveau_Charactere;
-
-            //var img = new Image();
-            /*var img = new Image();
-            img.src = "../assets/sprites/block.png";*/
-            /*img.onload = function() {
-              objC2D.drawImage(img, x*48, 0);
-            } */
+            
             var img;
             switch(strNiveau_Charactere) {
               /* legende de la carte du niveau : 
@@ -255,77 +234,48 @@
               case "$": 
                 intOr_Count++; 
                 
-                img = imgOr; 
-                objStage.addChild(img);
+                img = initImage(strSprite_Or, x, y);
 
                 break;
               case "@": 
-                img = objJoueur.img = imgJoueur; 
-                objStage.addChild(img);
+                img = objJoueur.img = initImage(strSprite_Joueur, x, y);
 
                 break;
               case "!":
                 intGarde_Count++; 
 
-                img = imgGarde; 
-                objStage.addChild(img);
+                img = initImage(strSprite_Garde, x, y);
 
                 break;
               case "H": 
-                img = imgEscalier; 
-                objStage.addChild(img);
+                img = initImage(strSprite_Escalier, x, y);
 
                 break;
               case "|": 
-                img = imgEscalier; 
-                objStage.addChild(img);
+                img = initImage(strSprite_Escalier, x, y);
 
                 break;
               case "-": 
-                img = imgCorde; 
-                objStage.addChild(img);
+                img = initImage(strSprite_Corde, x, y);
 
                 break;
               case "#":
-                img = imgBrique; 
-                objStage.addChild(img);
+                img = initImage(strSprite_Brique, x, y);
 
                 break;
               case "~": 
-                img = imgSol; 
-                objStage.addChild(img);
+                img = initImage(strSprite_Sol, x, y);
 
                 break;
               case " ": 
-                img = imgVide; 
-                objStage.addChild(img);
+                img = initImage(strSprite_Vide, x, y);
 
                 break;
             }
 
-            console.log(img.complete);
-
-            /*if (img.complete && img.naturalWidth !== 0 && img.naturalHeight !== 0) {
-              objC2D.drawImage(img, x*50, y*50);
-            }
-            else {*/
-              onloadImages(img, x*50, y*50);
-              /*img.onload = function() {
-                objC2D.drawImage(img, x*50, y*50);
-              }*/
-            //}
-
-            //console.log(strNiveau_Charactere);
-            //objC2D.drawImage(img, x*50, y*50);
-            //console.log(x + ", " + y);
-
-            //console.log(objCanvas.width + ", " + objCanvas.height);
-
-            //console.log(objStage.getChildAt(intNiveau_Charactere_Count));
+            objStage.addChild(img);
           }
-        }
-
-        
+        }     
 
         /*console.log(objStage.children);
         console.log(objStage.getNumChildren());
@@ -358,12 +308,9 @@
         objCanvas = document.getElementById('monCanvas');
         objC2D = objCanvas.getContext('2d');
 
+        objC2D.fillStyle = "black";
+        objC2D.fillRect(0, 0, objCanvas.width, objCanvas.height);
         objCanvas.focus();
-        
-        var canvas_Width = objCanvas.width, 
-            canvas_Height = objCanvas.height;
-
-        initImages();
         
         remettreVariables();
 
@@ -371,25 +318,20 @@
       }
 
       // initialise les images
-      function initImages() {
-        imgOr.src = strSprite_Or;
-        imgJoueur.src = strSprite_Joueur;
-        imgGarde.src = strSprite_Garde;
-        imgEscalier.src = strSprite_Escalier;
-        imgCorde.src = strSprite_Corde;
-        imgBrique.src = strSprite_Brique;
-        imgSol.src = strSprite_Sol;
-        imgVide.src = strSprite_Vide;
-      }
-      function onloadImages(img, x, y) {
-        img.onload = function() {
-          objC2D.drawImage(img, x, y);
-          //console.log(x + ", " + y);
-          //console.log(objStage.children);
+      // https://stackoverflow.com/questions/41463192/canvas-drawimage-loop-issue
+      function initImage(imgSrc, x, y) {
+        var image = new Image();
+        
+        image.src = imgSrc;
+        image.onload = function(){
+          objC2D.drawImage(image, x*(objCanvas.width/intNum_Cell_X), y*(objCanvas.height/intNum_Cell_Y));
         }
+
+        return image;
       }
 
-      // fonction stage qui initialise l'objet stage et elle est redefinie par celui-ci a chaque fois qu'on appelle la fonction remettreVariable()
+      // fonction stage qui initialise l'objet stage et 
+      // elle est redefinie par celui-ci a chaque fois qu'on appelle la fonction remettreVariable()
       function object_Stage() {
         // objet qui est retourne par la fonction
         var object_Stage = {};
@@ -580,7 +522,8 @@
         return object_Stage;
       }
 
-      // fonction stage qui initialise l'objet joueur et elle est redefinie par celui-ci a chaque fois qu'on appelle la fonction remettreVariable()
+      // fonction stage qui initialise l'objet joueur et 
+      // elle est redefinie par celui-ci a chaque fois qu'on appelle la fonction remettreVariable()
       function object_Joueur() {
         // objet qui est retourne par la fonction
         var object_Joueur = {};
