@@ -125,10 +125,9 @@
       // constantes globales qui contiennent les photos/sprites
       const srcSprites = "../assets/sprites/";
       const strSprite_Or = srcSprites + "gold.png", 
-            strSprite_Joueur = srcSprites + "runner.png", 
-            strSprite_Garde = srcSprites + "guard.png", 
+            strSprite_Joueur = srcSprites + "runner1.png", 
+            strSprite_Garde = srcSprites + "guard1.png", 
             strSprite_Escalier = srcSprites + "ladder.png", 
-            strSprite_Escalier_Final = srcSprites + "ladder.png", 
             strSprite_Corde = srcSprites + "rope.png", 
             strSprite_Brique = srcSprites + "brick.png", 
             strSprite_Sol = srcSprites + "block.png",
@@ -139,7 +138,16 @@
           objC2D = null;
 
       var objStage = null; // stage qui contient tous les enfants a dessiner et a mettre dans le jeu
-      var objSprite_Sheet = null;
+
+      // variables globales pour init les images
+      var imgOr = new Image(),
+          imgJoueur = new Image(),
+          imgGarde = new Image(),
+          imgEscalier = new Image(),
+          imgCorde = new Image(),
+          imgBrique = new Image(),
+          imgSol = new Image(),
+          imgVide = new Image();
 
       var objJoueur = null, // lode runner que le Joueur controle
           objMap = null, // representation des cellules dans un tableau array en 2d
@@ -214,115 +222,108 @@
         // retourne le charactere aux positions (x,y) du niveau
         var intNiveau_Charactere_Count = 0; 
 
-//////////////////////////////////////// DO MULTIPLES VARIABLES FOR ALL IMAGES ////////////////////////////////////
+        for (var x = 0; x < intNum_Cell_X; x++) { // parcours les cellules horizontales
+          // https://stackoverflow.com/questions/966225/how-can-i-create-a-two-dimensional-array-in-javascript
+          objMap[x] = []; // genere une erreure si on ne mets pas ca --> you have to set myArray[1]=[]; before assigning myArray[1][0]=5;
 
-        var img = new Image();
+          for (var y = 0; y < intNum_Cell_Y; y++) { // parcours les cellues verticales
+            objMap[x][y] = {}; // cree un nouveau objet aux coordonnees (x,y)
+
+            // retourne le charactere aux positions (x,y) du niveau
+            var strNiveau_Charactere = niveau.charAt(intNiveau_Charactere_Count++);
+            //strType = strNiveau_Charactere;
+
             //var img = new Image();
-            //img.src = "../assets/sprites/gold.png";
-            img.onload = function() {
-              for (var x = 0; x < intNum_Cell_X; x++) { // parcours les cellules horizontales
-                // https://stackoverflow.com/questions/966225/how-can-i-create-a-two-dimensional-array-in-javascript
-                objMap[x] = []; // genere une erreure si on ne mets pas ca --> you have to set myArray[1]=[]; before assigning myArray[1][0]=5;
+            /*var img = new Image();
+            img.src = "../assets/sprites/block.png";*/
+            /*img.onload = function() {
+              objC2D.drawImage(img, x*48, 0);
+            } */
+            var img;
+            switch(strNiveau_Charactere) {
+              /* legende de la carte du niveau : 
+                  $ = or
+                  @ = Joueur
+                  ! = garde
+                  H = escalier
+                  | = escalier final
+                  - = corde
+                  # = passerelle de brique
+                  ~ = sol
+                    = vide
+              */
+              case "$": 
+                intOr_Count++; 
+                
+                img = imgOr; 
+                objStage.addChild(img);
 
-                for (var y = 0; y < intNum_Cell_Y; y++) { // parcours les cellues verticales
-                  objMap[x][y] = {}; // cree un nouveau objet aux coordonnees (x,y)
+                break;
+              case "@": 
+                img = objJoueur.img = imgJoueur; 
+                objStage.addChild(img);
 
-                  // retourne le charactere aux positions (x,y) du niveau
-                  var strNiveau_Charactere = niveau.charAt(intNiveau_Charactere_Count++);
-                  objMap[x][y].strType = strNiveau_Charactere;
-                  //objStage.addChild(strNiveau_Charactere);
+                break;
+              case "!":
+                intGarde_Count++; 
 
-                  //var img = new Image();
-                  /*var img = new Image();
-                  img.src = "../assets/sprites/block.png";*/
-                  /*img.onload = function() {
-                    objC2D.drawImage(img, x*48, 0);
-                  } */
+                img = imgGarde; 
+                objStage.addChild(img);
 
-                  switch(strNiveau_Charactere) {
-                    /* legende de la carte du niveau : 
-                        $ = or
-                        @ = Joueur
-                        ! = garde
-                        H = escalier
-                        | = escalier final
-                        - = corde
-                        # = passerelle de brique
-                        ~ = sol
-                          = vide
-                    */
-                    case "$": 
-                      intOr_Count++; 
-                      
-                      img.src = strSprite_Or;
-                      objMap[x][y].strSprite = img; 
-                      objStage.addChild(img);
+                break;
+              case "H": 
+                img = imgEscalier; 
+                objStage.addChild(img);
 
-                      break;
-                    case "@": 
-                      img.src = strSprite_Joueur
-                      objMap[x][y].strSprite = objJoueur.strSprite = img; 
-                      objStage.addChild(img);
+                break;
+              case "|": 
+                img = imgEscalier; 
+                objStage.addChild(img);
 
-                      break;
-                    case "!":
-                      intGarde_Count++; 
+                break;
+              case "-": 
+                img = imgCorde; 
+                objStage.addChild(img);
 
-                      img.src = strSprite_Garde;
-                      objMap[x][y].strSprite = img; 
-                      objStage.addChild(img);
+                break;
+              case "#":
+                img = imgBrique; 
+                objStage.addChild(img);
 
-                      break;
-                    case "H": 
-                      img.src = strSprite_Escalier;
-                      objMap[x][y].strSprite = img; 
-                      objStage.addChild(img);
+                break;
+              case "~": 
+                img = imgSol; 
+                objStage.addChild(img);
 
-                      break;
-                    case "|": 
-                      img.src = strSprite_Escalier_Final;
-                      objMap[x][y].strSprite = img; 
-                      objStage.addChild(img);
+                break;
+              case " ": 
+                img = imgVide; 
+                objStage.addChild(img);
 
-                      break;
-                    case "-": 
-                      img.src = strSprite_Corde;
-                      objMap[x][y].strSprite = img; 
-                      objStage.addChild(img);
+                break;
+            }
 
-                      break;
-                    case "#":
-                      img.src =  strSprite_Brique;
-                      objMap[x][y].strSprite = img; 
-                      objStage.addChild(img);
+            console.log(img.complete);
 
-                      break;
-                    case "~": 
-                      img.src = strSprite_Sol;
-                      objMap[x][y].strSprite = img; 
-                      objStage.addChild(img);
+            /*if (img.complete && img.naturalWidth !== 0 && img.naturalHeight !== 0) {
+              objC2D.drawImage(img, x*50, y*50);
+            }
+            else {*/
+              onloadImages(img, x*50, y*50);
+              /*img.onload = function() {
+                objC2D.drawImage(img, x*50, y*50);
+              }*/
+            //}
 
-                      break;
-                    case " ": 
-                      img.src = strSprite_Vide;
-                      objMap[x][y].strSprite = img; 
-                      objStage.addChild(img);
+            //console.log(strNiveau_Charactere);
+            //objC2D.drawImage(img, x*50, y*50);
+            //console.log(x + ", " + y);
 
-                      //objC2D
+            //console.log(objCanvas.width + ", " + objCanvas.height);
 
-                      break;
-                  }
-
-                  
-                  objC2D.drawImage(img, x*50, y*50);
-                  //console.log(x + ", " + y);
-
-                  //console.log(objCanvas.width + ", " + objCanvas.height);
-
-                  //console.log(objStage.getChildAt(intNiveau_Charactere_Count));
-                }
-              }
-            } 
+            //console.log(objStage.getChildAt(intNiveau_Charactere_Count));
+          }
+        }
 
         
 
@@ -338,9 +339,20 @@
         console.log(objStage.getChildIndex("@"));
         console.log(objStage.getChildAt(406));*/
 
-        //console.log(objJoueur.strSprite);
+        //console.log(objJoueur.img);
       }
 
+      /* legende de la carte du niveau : 
+          $ = or
+          @ = Joueur
+          ! = garde
+          H = escalier
+          | = escalier final
+          - = corde
+          # = passerelle de brique
+          ~ = sol
+            = vide
+      */
       function initLodeRunner() { // demarre le jeu
         // variables canvas 
         objCanvas = document.getElementById('monCanvas');
@@ -350,16 +362,31 @@
         
         var canvas_Width = objCanvas.width, 
             canvas_Height = objCanvas.height;
+
+        initImages();
         
         remettreVariables();
 
         construireNiveau(arrNiveau_Map[intNiveau_Courant-1]);
+      }
 
-        /*var img = new Image();
-        img.src = "../assets/sprites/block.png";
+      // initialise les images
+      function initImages() {
+        imgOr.src = strSprite_Or;
+        imgJoueur.src = strSprite_Joueur;
+        imgGarde.src = strSprite_Garde;
+        imgEscalier.src = strSprite_Escalier;
+        imgCorde.src = strSprite_Corde;
+        imgBrique.src = strSprite_Brique;
+        imgSol.src = strSprite_Sol;
+        imgVide.src = strSprite_Vide;
+      }
+      function onloadImages(img, x, y) {
         img.onload = function() {
-          objC2D.drawImage(img, 0, 0);
-        }*/
+          objC2D.drawImage(img, x, y);
+          //console.log(x + ", " + y);
+          //console.log(objStage.children);
+        }
       }
 
       // fonction stage qui initialise l'objet stage et elle est redefinie par celui-ci a chaque fois qu'on appelle la fonction remettreVariable()
@@ -558,7 +585,7 @@
         // objet qui est retourne par la fonction
         var object_Joueur = {};
 
-        object_Joueur.strSprite = null;
+        object_Joueur.img = null;
 
         return object_Joueur;
       }
