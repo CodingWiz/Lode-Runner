@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="fr" xml:lang="fr">
+  <title>Lode Runner par Andrew Chedid et Mohamed H. Guelleh</title>
+    <link rel="stylesheet" type="text/css" href="" />
+
+    <script type="text/javascript"></script>
+
+    <script type="text/javascript">
+      var objCanvas;
+      var objC2D;
+      var Image_Block = new Image();
+      var Image_Brick = new Image();
+      var Image_Empty = new Image();
+      var Image_Gold = new Image();
+      var Image_Ground = new Image();
+      var tab_Image_Guard = new Array(22);
+      var Image_Guard = new Image();
+      var Image_Hladder = new Image();
+      var Image_Hole = new Image();
+      var tab_Image_Hole = new Array(18);
+      var Image_Ladder = new Image();
+      var Image_Over = new Image();
+      var Image_Redhat = new Image();
+      var tab_Image_Redhat = new Array(22);
+      var Image_Rope = new Image();
+      var Image_Runner = new Image();
+      var tab_Image_Runner = new Array(18);
+      var Image_Text = new Image();
+      var tab_Image_Text=new Array(60);
+      var Image_Trap = new Image();
+      var intOptions=0;
+      var intPositionX=0;
+      var intPositionY=40;
+      var binGauche=false;
+
+      function initAnimation() {
+        objCanvas = document.getElementById('monCanvas');
+        objC2D = objCanvas.getContext('2d');
+        initImage();
+        animer();
+      }
+      
+      function deplacerJoueur(){
+               
+
+        switch (event.keyCode) {
+            case 39: // Flèche-à-droite
+                // Déplacer à droite si le bâton n'entre pas en collision avec le mur droite
+                /*
+                intOptions=intOptions%12;
+                if(intOptions<9){
+                  intOptions=+9;
+                }
+                */
+                intOptions++;
+                binGauche=false;
+                intOptions=intOptions%3;
+                
+                intPositionX+=5;
+                
+                break;
+            case 37: // Flèche-à-gauche
+                // Déplacer à gauche si le bâton n'entre pas en collision avec le mur gauche
+                /*
+                intOptions=intOptions%15;
+                if(intOptions<12){
+                  intOptions=+12;
+                }
+                */
+                intOptions++;
+                binGauche=true;
+                intOptions=intOptions%6;
+                if(intOptions<3){
+                  intOptions=+3;
+                }
+                
+               intPositionX-=5;
+                break;
+            case 38: // Flèche-en-haut
+              intOptions++;
+                 intOptions=intOptions%8;
+                if(intOptions<6){
+                  intOptions=+6;
+                }
+                break;
+              
+            case 40:
+              if(binGauche){
+                intOptions=17;
+              }else{
+                intOptions=8;
+              }
+              break;
+            
+            case 32:
+              if(binGauche){
+                intOptions=16;
+              }else{
+                intOptions=15;
+              }
+              break;
+            
+        }
+      }
+            
+      function initImage(){
+         
+         
+         Image_Block.src = "../assets/sprites/block.png";
+         
+         Image_Brick.src = "../assets/sprites/brick.png";
+         
+         Image_Empty.src = "../assets/sprites/empty.png";
+         
+         Image_Gold.src = "../assets/sprites/gold.png";
+         
+         Image_Ground.src = "../assets/sprites/ground.png";
+         
+          Image_Guard.src = "../assets/sprites/guard.png";
+          
+          for (var i=0;i<22;i++){
+              tab_Image_Guard[i]=new Array(2);
+              tab_Image_Guard[i][0] = 0;
+              tab_Image_Guard[i][1] = 0;
+          }
+          
+            for (var i=0;i<11;i++){
+              tab_Image_Guard[i][0] = 40*i;
+              tab_Image_Guard[i][1] = 0;
+            }
+            for (var i=11;i<22;i++){
+              tab_Image_Guard[i][0] = 40*(i-11);
+              tab_Image_Guard[i][1] = 85;
+            }
+          
+          Image_Hladder.src="../assets/sprites/hladder.png";
+          
+          Image_Hole.src="../assets/sprites/hole.png";
+          
+          
+            for (var i=0;i<9;i++){
+              tab_Image_Hole[i]=new Array(2);
+              
+              tab_Image_Hole[i][0] = 40*i;
+              tab_Image_Hole[i][1] = 0;
+            }
+            for (var i=9;i<18;i++){
+              tab_Image_Hole[i]=new Array(2);
+              tab_Image_Hole[i][0] = 40*(i-9);
+              tab_Image_Hole[i][1] = 85;
+            }
+           
+          Image_Ladder.src="../assets/sprites/ladder.png";
+          
+          Image_Over.src="../assets/sprites/over.png";
+          
+          Image_Redhat.src="../assets/sprites/redhat.png";
+          
+            for (var i=0;i<11;i++){
+              tab_Image_Redhat[i]=new Array(2);
+              tab_Image_Redhat[i][0] = 40*i;
+              tab_Image_Redhat[i][1] = 0;
+            }
+            for (var i=11;i<22;i++){
+              tab_Image_Redhat[i]=new Array(2);
+             tab_Image_Redhat[i][0] = 40*(i-11);
+             tab_Image_Redhat[i][1] = 85;
+            }
+            
+          Image_Rope.src="../assets/sprites/rope.png";
+            
+          Image_Runner.src="../assets/sprites/runner.png";
+            
+            for (var i=0;i<9;i++){
+              tab_Image_Runner[i]=new Array(2);
+              tab_Image_Runner[i][0] = 40*i;
+              tab_Image_Runner[i][1] = 0;
+            }
+            for (var i=9;i<18;i++){
+              tab_Image_Runner[i]=new Array(2);
+              tab_Image_Runner[i][0] = 40*(i-9);
+              tab_Image_Runner[i][1] = 85;
+            }
+          
+          Image_Text.src="../assets/sprites/text.png";
+          
+          for(var j=0;j<6;j++){
+            for (var i=10*j;i<10*(j+1);i++){
+              tab_Image_Text[i]=new Array(2);
+              tab_Image_Text[i][0] = 40*(i-(j*10));
+              tab_Image_Text[i][1] = 44*j;
+            }
+          }
+          
+          Image_Trap.src="../assets/sprites/trap.png";
+          
+          Image_Runner.onload=function(){
+            objC2D.drawImage(Image_Runner,0,0);
+          }
+      }
+      
+      
+      function animer() {
+        // Requête pour le prochain cycle
+        objCycleAnimation = requestAnimationFrame(animer);
+	    // Le cycle d'animation
+	    //effacerDessin();
+	   mettreAJourAnimation();
+	    //dessinerYinYang(fltMilieu);
+      
+        dessiner();
+      }
+      
+      function mettreAJourAnimation(){
+        
+      }
+      
+      function dessiner(){
+        objC2D.fillStyle='black';
+         objC2D.fillRect(0,0,objCanvas.width,objCanvas.height);
+        objC2D.drawImage(Image_Runner, tab_Image_Runner[intOptions][0],tab_Image_Runner[intOptions][1], 40,85, intPositionX,intPositionY, 40,85);
+
+      }
+      
+      function effacerDessin() {
+	    objC2D.clearRect(0,0, objCanvas.width, objCanvas.height); 
+      }
+     
+    </script>
+  </head>
+  
+  
+  <body onload="initAnimation()"> 
+    <canvas id="monCanvas" width="760" height="620" tabIndex="1" onkeydown="deplacerJoueur();";>
+      Votre navigateur ne supporte pas la balise canvas
+    </canvas>
+  </body>
+</html>
