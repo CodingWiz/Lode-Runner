@@ -123,7 +123,7 @@
       // constantes globales qui contiennent les photos/sprites
       const srcSprites = "../assets/sprites/";
       const strSprite_Or = srcSprites + "gold.png", 
-            strSprite_Joueur = srcSprites + "runner1.png", 
+            strSprite_Joueur = srcSprites + "runner.png", 
             strSprite_Garde = srcSprites + "guard1.png", 
             strSprite_Escalier = srcSprites + "ladder.png", 
             strSprite_Corde = srcSprites + "rope.png", 
@@ -255,6 +255,7 @@
                 //objImage.img = objJoueur.img = initImage(strSprite_Joueur, x, y);
 
                 objJoueur.objImage = objImage;
+                objJoueur.initTab_Images_Runner();
 
                 break;
               case "!":
@@ -338,7 +339,7 @@
         construireNiveau(arrNiveau_Map[intNiveau_Courant-1]);  
         
         objStage.draw();
-        initImage();
+        //initImage();
         animer();
       }
 
@@ -356,8 +357,16 @@
         
         
         //effacerDessin();
-        dessiner();
+        //blackCanvas();
+
+        blackCanvas();
+
+        //objStage.clearDraw();
+        //dessiner();
         objStage.draw();
+        //objStage.clearDraw();
+        //objJoueur.dessiner();
+        //objJoueur.dessiner();
       }
       function effacerDessin() {
 	      objC2D.clearRect(0, 0, objCanvas.width, objCanvas.height); 
@@ -592,8 +601,16 @@
             }
           });
         };
+
+        object_Stage.setVisibleCharactere = function(strCharactere, blnVisible) {
+          this.children.forEach(objImage => {
+            if (objImage.getStrCharactere() === strCharactere) {
+              objImage.visible = blnVisible;
+            }
+          });
+        };
         
-        object_Stage.removeImageIndexAt = function(strCharactere, x, y) {
+        object_Stage.removeImageCharactereAt = function(strCharactere, x, y) {
           var blnTrouve = false,
               intCount = 0,
               intX = x,
@@ -621,7 +638,7 @@
             intX + "x, " + intY + "y)");
           }
         };
-        object_Stage.removeAllImageIndex = function(strCharactere) {
+        object_Stage.removeAllImageCharactere = function(strCharactere) {
           var blnTrouve = false,
               intCount = 0;
 
@@ -706,14 +723,35 @@
             if (objImage.firstLoad) {
               var image = new Image();
 
-              image.onload = function() {
-                objC2D.drawImage(
+              if (objImage.getStrCharactere() == "@") {
+                image.onload = function() {
+                  objC2D.drawImage(
                   image, 
-                  objImage.getX()*(objCanvas.width/intNum_Cell_X), 
-                  objImage.getY()*(objCanvas.height/intNum_Cell_Y), 
-                  52, 
-                  64
+                  /*objImage.getX()*(objCanvas.width/intNum_Cell_X),
+                  objImage.getY()*(objCanvas.height/intNum_Cell_Y),
+                  52,
+                  64*/
+                  objJoueur.getTab_Image_Runner(0),
+                  objJoueur.getTab_Image_Runner(1),
+                  40,
+                  85,
+                  objJoueur.getIntPositionX(),
+                  objJoueur.getIntPositionY(),
+                  40,
+                  85
                 );
+                }
+              }
+              else {
+                image.onload = function() {
+                  objC2D.drawImage(
+                    image, 
+                    objImage.getX()*(objCanvas.width/intNum_Cell_X), 
+                    objImage.getY()*(objCanvas.height/intNum_Cell_Y), 
+                    52, 
+                    64
+                  );
+                }
               }
 
               image.src = objImage.getStrSrc();
@@ -723,20 +761,46 @@
               objImage.firstLoad = false;
             }
             else {
-              if (objImage.visible) {
+              /*if (objImage.visible) {
                 objImage.img.src = objImage.getStrSrc();
               }
               else {              
                 objImage.img.src = strSprite_Vide;
+              }*/
+
+              if (objImage.getStrCharactere() == "@") {
+                objC2D.drawImage(
+                  objImage.img, 
+                  objJoueur.getTab_Image_Runner(0),
+                  objJoueur.getTab_Image_Runner(1),
+                  40,
+                  85,
+                  objJoueur.getIntPositionX(),
+                  objJoueur.getIntPositionY(),
+                  40,
+                  85
+                );
+              }
+              else {
+                objC2D.drawImage(
+                  objImage.img, 
+                  objImage.getX()*(objCanvas.width/intNum_Cell_X), 
+                  objImage.getY()*(objCanvas.height/intNum_Cell_Y), 
+                  52, 
+                  64
+                );
               }
             }
           });
         };
-        object_Stage.clearDraw = function() {
+
+        // !!! NE PAS UTILISER. LE CODE NE MARCHE PAS. UTILISER blackCanvas() AVEC objStage.draw() !!!
+        /*object_Stage.clearDraw = function() {
           this.children.forEach(objImage => {
-            objImage.img.src = strSprite_Vide;
+            //if (objImage.getStrCharactere() != "@")
+            //objImage.img.src = strSprite_Vide;
           });
-        };
+        };*/
 
         /*object_Stage.update = function(props) {
           if (!this.canvas) { 
@@ -820,29 +884,100 @@
 
         object_Joueur.binGauche = false;
 
-        object_Joueur.moveRight = function() {
-          intOptions++;
-          binGauche = false;
-          intOptions = intOptions % 3;
+        object_Joueur.tab_Image_Runner = null;
+        object_Joueur.initTab_Images_Runner = function() {
+          this.tab_Image_Runner = new Array(18);
+
+          for (var i=0;i<9;i++){
+            this.tab_Image_Runner[i] = new Array(2);
+            this.tab_Image_Runner[i][0] = 40*i;
+            this.tab_Image_Runner[i][1] = 0;
+          }
+          for (var i=9;i<18;i++){
+            this.tab_Image_Runner[i] = new Array(2);
+            this.tab_Image_Runner[i][0] = 40*(i-9);
+            this.tab_Image_Runner[i][1] = 85;
+          }
+        };
+
+        object_Joueur.getIntPositionX = function() {
+          return this.intPositionX;
+        };
+        object_Joueur.getIntPositionY = function() {
+          return this.intPositionY;
+        };
+        object_Joueur.getTab_Image_Runner = function(x) {
+          return this.tab_Image_Runner[this.intOptions][x];
+        };
+
+        object_Joueur.dessiner = function() {
+          //objStage.removeAllImageCharactere("@");
+          /*objC2D.drawImage(
+            this.objImage.img, 
+            this.tab_Image_Runner[this.intOptions][0],
+            this.tab_Image_Runner[this.intOptions][1],
+            40,
+            85,
+            this.intPositionX,
+            this.intPositionY,
+            40,
+            85
+          );*/
           
-          intPositionX += 5;
+          objStage.setVisibleCharactere("@", true);
+        };
+
+        object_Joueur.moveRight = function() {
+          /*objC2D.fillStyle='black';
+          objC2D.fillRect(this.intPositionX, this.intPositionY, this.intPositionX+1, this.intPositionY+1);*/
+          //this.objImage.img.src = strSprite_Vide;
+
+          /*objC2D.drawImage(
+            image_Empty(), 
+            this.tab_Image_Runner[this.intOptions][0],
+            this.tab_Image_Runner[this.intOptions][1],
+            40,
+            85,
+            this.intPositionX,
+            this.intPositionY,
+            40,
+            85
+          );*/
+
+          //image_Empty(this.tab_Image_Runner[this.intOptions][0], this.tab_Image_Runner[this.intOptions][1], 40, 85);
+
+          //this.objImage.img.src = strSprite_Vide;
+
+          //objStage.removeAllImageCharactere("@");
+          
+          //objStage.setVisibleCharactere("@", false);
+
+          this.intOptions++;
+          this.binGauche = false;
+          this.intOptions = this.intOptions % 3;
+          
+          this.intPositionX += 5;
+
+          //objStage.setVisibleCharactere("@", true);
         };
         object_Joueur.moveLeft = function() {
-          intOptions++;
-          binGauche = true;
-          intOptions = intOptions % 6;
-          if (intOptions < 3) {
-            intOptions =+ 3;
+          this.intOptions++;
+          this.binGauche = true;
+          this.intOptions = this.intOptions % 6;
+          
+          if (this.intOptions < 3) {
+            this.intOptions =+ 3;
           }
           
-          intPositionX -= 5;
+          this.intPositionX -= 5;
         };
 
         object_Joueur.moveUp = function() {
-          intOptions++;
-          intOptions = intOptions % 8;
-          if (intOptions < 6) {
-            intOptions =+ 6;
+          this.intOptions++;
+          this.intOptions = this.intOptions % 8;
+          
+          if (this.intOptions < 6) {
+            this.intOptions =+ 6;
           }
         };
         object_Joueur.moveDown = function() {
@@ -850,11 +985,11 @@
         };
 
         object_Joueur.fall = function() {
-          if (binGauche) {
-            intOptions = 17;
+          if (this.binGauche) {
+            this.intOptions = 17;
           }
           else {
-            intOptions = 8;
+            this.intOptions = 8;
           }
         };
 
@@ -866,11 +1001,11 @@
         };
 
         object_Joueur.remove = function() {
-          if (binGauche) {
-            intOptions=16;
+          if (this.binGauche) {
+            this.intOptions=16;
           }
           else{
-            intOptions=15;
+            this.intOptions=15;
           }
         };
         object_Joueur.removeRight = function() {
@@ -881,6 +1016,24 @@
         };
 
         return object_Joueur;
+      }
+
+      function image_Empty() {
+        var img = new Image();
+
+        img.onload = function(/*intPositionX, intPositionY, intTransformX, intTransformY*/) {
+          /*objC2D.drawImage(
+            img, 
+            intPositionX, 
+            intPositionY, 
+            intTransformX, 
+            intTransformY
+          );*/
+        }
+
+        img.src = strSprite_Vide;
+
+        return img;
       }
 
       function object_Images() {
@@ -894,6 +1047,10 @@
 
         object_Images.firstLoad = null;
         object_Images.visible = null;
+
+        object_Images.getImg = function() {
+          return this.img;
+        };
 
         object_Images.toString = function() {
           return "[\n" + 
@@ -967,7 +1124,7 @@
   
   
   <body onload="initLodeRunner()"> 
-    <canvas id="monCanvas" width="1440" height="1088" onkeydown="deplacerJoueur();">
+    <canvas id="monCanvas" width="1440" height="1088" tabIndex="1" onkeydown="deplacerJoueur();";>
       Votre navigateur ne supporte pas la balise canvas
     </canvas>
   </body>
