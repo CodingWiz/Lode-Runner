@@ -8,87 +8,16 @@
     <link rel="stylesheet" type="text/css" href="" />
 
     <script type="text/javascript">
-      /*function strSprite (options) {
-          
-          var img = {};
-          frameIndex = 0,
-          tickCount = 0,
-          ticksPerFrame = 0;
-          numberOfFrames = options.numberOfFrames || 1;
-                
-          img.context = options.context;
-          img.width = options.width;
-          img.height = options.height;
-          img.image = options.image;
-
-          img.render = function () {
-            // Draw the animation
-            img.context.drawImage(img.image, frameIndex * img.width / numberOfFrames, 0, img.width / numberOfFrames, img.height, 0, 0, img.width / numberOfFrames, img.height);
-          };
-
-          img.loop = options.loop;
-
-          img.update = function () {
-            tickCount += 1;
-
-            if (tickCount > ticksPerFrame) {
-              tickCount = 0;
-
-              // If the current frame index is in range
-              if (frameIndex < numberOfFrames - 1) {	
-                  // Go to the next frame
-                  frameIndex += 1;
-              }	else if (img.loop) {
-                frameIndex = 0;
-              }
-            }
-          };
-      
-          return img;
-      }
-
-      function initLoadRunner() {
-        var objCanvas = document.getElementById('monCanvas'),
-            objC2D = objCanvas.getContext('2d');
-
-        objCanvas.focus();
-        
-        var width = objCanvas.width, 
-            height = objCanvas.height;
-        
-        var imgTest = new Image();
-        imgTest.src = "https://cdn.codeandweb.com/blog/2016/05/10/how-to-create-a-sprite-sheet/spritestrip.png";
-
-        var test = strSprite({
-          context: objC2D,
-          width: 256,
-          height: 256,
-          image: imgTest
-        });
-
-        window.requestAnimationFrame(initLoadRunner);
-        
-        test.update();
-        test.render();
-
-        // Start the game loop as soon as the strSprite sheet is loaded
-        test.addEventListener("load", initLoadRunner);
-      }*/
-
-      /*function gameLoop () {
-        window.requestAnimationFrame(initLoadRunner);
-
-        coin.update();
-        coin.render();
-      }*/
-
-      
-      
-
       // variables constantes
       const intNiveau_1 = 1, intNiveau_2 = 2, intNiveau_3 = 3;
       const intNum_Cell_X = 28, intNum_Cell_Y = 17;
-      const intPixelWidth = 40, intPixelHeight = 44;
+
+      const intPixelWidthOr = 35, intPixelHeightOr = 42;
+      const intPixelWidthRunner = 50, intPixelHeightRunner = 65;
+      const intPixelWidthGarde = 50, intPixelHeightGarde = 66;
+      const intPixelWidthEscalier = 50, intPixelHeightEscalier = 66;
+      const intPixelWidthCorde = 50, intPixelHeightCorde = 66;
+      const intPixelWidthBrique = 55, intPixelHeightBrique = 66;
 
       /* legende de la carte du niveau : 
           $ = or
@@ -160,41 +89,6 @@
         objJoueur = object_Joueur({
         });
 
-        /*objSprite_Sheet = object_SpriteSheet({
-          images: [runnerImage],
-		
-          frames: {
-            regX:0, 
-            height: BASE_TILE_Y,  
-            regY:0, 
-            width: BASE_TILE_X
-          },
-          
-          animations: { 
-            runRight: [0,2, "runRight", RUNNER_SPEED], 
-            runLeft : [3,5, "runLeft",  RUNNER_SPEED], 
-            runUpDn : [6,7, "runUpDn",  RUNNER_SPEED],
-
-            barRight: {
-              frames: [ 18, 19, 19, 20, 20 ],
-              next:  "barRight",
-              speed: RUNNER_SPEED
-            },
-
-            barLeft: {
-              frames: [ 21, 22, 22, 23, 23 ],
-              next:  "barLeft",
-              speed: RUNNER_SPEED
-            },
-                
-            digRight: 24,
-            digLeft : 25,
-
-            fallRight : 8,
-            fallLeft: 26
-          }
-        });*/
-
         //objMap = [[]];
 
         // niveau 1 par defaut
@@ -229,12 +123,6 @@
             objImage.intX = x;
             objImage.intY = y;
 
-            objImage.pixelX1 = x*(objCanvas.width/intNum_Cell_X);
-            objImage.pixelY1 = y*(objCanvas.height/intNum_Cell_Y);
-
-            objImage.pixelX2 = objImage.pixelX1 + 40;
-            objImage.pixelY2 = objImage.pixelY1 + 44;
-
             objImage.visible = true;
             objImage.firstLoad = true;
 
@@ -256,10 +144,22 @@
                 objImage.strSrc = strSprite_Or;
                 //objImage.img = initImage(strSprite_Or, x, y);
 
+                objImage.pixelX1 = x*(objCanvas.width/intNum_Cell_X) + (intPixelWidthOr/3);
+                objImage.pixelY1 = y*(objCanvas.height/intNum_Cell_Y) + (intPixelHeightOr/2);
+
+                objImage.pixelX2 = objImage.getPixelX1() + intPixelWidthOr
+                objImage.pixelY2 = objImage.getPixelY1() + intPixelHeightOr;
+
                 break;
               case "@": 
                 objImage.strSrc = objJoueur.strSrc = strSprite_Joueur;
                 //objImage.img = objJoueur.img = initImage(strSprite_Joueur, x, y);
+
+                objImage.pixelX1 = x*(objCanvas.width/intNum_Cell_X);
+                objImage.pixelY1 = y*(objCanvas.height/intNum_Cell_Y);
+
+                objImage.pixelX2 = objImage.getPixelX1() + intPixelWidthRunner;
+                objImage.pixelY2 = objImage.getPixelY1() + intPixelHeightRunner;
 
                 objJoueur.objImage = objImage;
                 objJoueur.initTab_Images_Runner();
@@ -272,25 +172,57 @@
                 objImage.strSrc = strSprite_Garde;
                 //objImage.img = initImage(strSprite_Garde, x, y);
 
+                objImage.pixelX1 = x*(objCanvas.width/intNum_Cell_X);
+                objImage.pixelY1 = y*(objCanvas.height/intNum_Cell_Y);
+
+                objImage.pixelX2 = objImage.getPixelX1() + intPixelWidthGarde;
+                objImage.pixelY2 = objImage.getPixelY1() + intPixelHeightGarde;
+
                 break;
               case "H": 
                 objImage.strSrc = strSprite_Escalier;
                 //objImage.img = initImage(strSprite_Escalier, x, y);
+
+                objImage.pixelX1 = x*(objCanvas.width/intNum_Cell_X);
+                objImage.pixelY1 = y*(objCanvas.height/intNum_Cell_Y);
+
+                objImage.pixelX2 = objImage.getPixelX1() + intPixelWidthEscalier;
+                objImage.pixelY2 = objImage.getPixelY1() + intPixelHeightEscalier;
 
                 break;
               case "|": 
                 objImage.strSrc = strSprite_Escalier;
                 //objImage.img = initImage(strSprite_Escalier, x, y);
 
+                objImage.pixelX1 = x*(objCanvas.width/intNum_Cell_X);
+                objImage.pixelY1 = y*(objCanvas.height/intNum_Cell_Y);
+
+                objImage.pixelX2 = objImage.getPixelX1() + intPixelWidthEscalier;
+                objImage.pixelY2 = objImage.getPixelY1() + intPixelHeightEscalier;
+
+                objImage.visible = false;
+
                 break;
               case "-": 
                 objImage.strSrc = strSprite_Corde;
                 //objImage.img = initImage(strSprite_Corde, x, y);
 
+                objImage.pixelX1 = x*(objCanvas.width/intNum_Cell_X);
+                objImage.pixelY1 = y*(objCanvas.height/intNum_Cell_Y);
+
+                objImage.pixelX2 = objImage.getPixelX1() + intPixelWidthCorde;
+                objImage.pixelY2 = objImage.getPixelY1() + intPixelHeightCorde;
+
                 break;
               case "#":
                 objImage.strSrc = strSprite_Brique;
                 //objImage.img = initImage(strSprite_Brique, x, y);
+
+                objImage.pixelX1 = x*(objCanvas.width/intNum_Cell_X);
+                objImage.pixelY1 = y*(objCanvas.height/intNum_Cell_Y);
+
+                objImage.pixelX2 = objImage.getPixelX1() + intPixelWidthBrique;
+                objImage.pixelY2 = objImage.getPixelY1() + intPixelHeightBrique;
 
                 break;
               case "~": 
@@ -320,6 +252,8 @@
         console.log(objStage.getNumChildren());
         console.log(objStage.getChildIndex("@"));
         console.log(objStage.getChildAt(406));*/
+
+        
       }
 
       /* legende de la carte du niveau : 
@@ -347,7 +281,11 @@
         construireNiveau(arrNiveau_Map[intNiveau_Courant-1]);  
         
         objStage.draw();
-        //initImage();
+
+        //objStage.getConsoleImageIndexAt("H");
+        //console.log(objStage.getChildCharacterePositionAt("$", 17, 14));
+        //console.log(objStage.collision(objJoueur.objImage, objStage.getChildCharacterePositionAt("$", 17, 14)));
+
         animer();
       }
 
@@ -362,20 +300,47 @@
         objCycleAnimation = requestAnimationFrame(animer);
 	
         // Le cycle d'animation
-        
-        
-        //effacerDessin();
-        //blackCanvas();
-
-        //blackCanvas();
-
-        //objStage.clearDraw();
-        //dessiner();
         objStage.draw();
-        //console.log("Animer: " + objJoueur.getintPositionX1() + "x, " + objJoueur.getintPositionY1() + "y");
-        //objStage.clearDraw();
-        //objJoueur.dessiner();
-        //objJoueur.dessiner();
+        //objStage.getConsoleImageIndexAt("@");
+
+        objStage.getChildCharactereAt("$").forEach(objImage => {
+          if (objStage.collision(objJoueur.objImage, objImage)) {
+            //objImage.visible = false; // pour les gardes
+            objStage.removeChild(objImage); // pour lode runner
+            intOr_Count--;
+          }
+        });
+
+        //console.log(intOr_Count);
+
+        if (intOr_Count == 0) {
+          /*objStage.children.forEach(objImage => {
+            if (objImage.getStrCharactere() == "|") {
+              objImage.visible = true;
+            }
+          });*/
+          objStage.getChildCharactereAt("|").forEach(objImage => {
+            objImage.visible = true;
+          }); 
+        }
+
+        objStage.showHitBoxes(objJoueur.objImage, "white");
+        objStage.getChildCharactereAt("H").forEach(objImage => {
+          objStage.showHitBoxes(objImage, "yellow");
+        });
+        objStage.getChildCharactereAt("#").forEach(objImage => {
+          objStage.showHitBoxes(objImage, "red");
+        });
+
+        //console.log(objJoueur.objImage.getX() + "x, " + objJoueur.objImage.getY() + "y");
+
+        //objStage.getConsoleImageIndexAt("$");
+        //console.log(objStage.getChildCharacterePositionAt("$", 17, 14));
+        //console.log(objStage.collision(objJoueur.objImage, objStage.getChildCharacterePositionAt("$", 17, 14)));
+
+        /*objStage.getChildCharactereAt("H").forEach(objImage => {
+          console.log(objStage.collision(objJoueur.objImage, objImage));
+        });*/
       }
       function effacerDessin() {
 	      objC2D.clearRect(0, 0, objCanvas.width, objCanvas.height); 
@@ -516,6 +481,8 @@
         object_Stage.canvas = objCanvas;
 
         object_Stage.children = [];
+
+        //object_Stage.arrGold = [];
         
         object_Stage.getChildAt = function(index) {
           return this.children[index];
@@ -611,13 +578,13 @@
           });
         };
 
-        object_Stage.getCharactereAt = function(x, y) {
+        /*object_Stage.getCharactereAt = function(x, y) {
           this.children.forEach(objImage => {
             if (objImage.getX() == x && objImage.getY() == y) {
               console.log(objImage.getStrCharactere());
             }
           });
-        };
+        };*/
 
         object_Stage.setVisibleCharactere = function(strCharactere, blnVisible) {
           this.children.forEach(objImage => {
@@ -735,6 +702,100 @@
           return -1;
         };
 
+        object_Stage.getChildCharactereAt = function(strCharactere) {
+          if (strCharactere == "$" || strCharactere == "|" || strCharactere == "H" || strCharactere == "-" || strCharactere == "#") {
+            var arrContainer = [];
+
+            this.children.forEach(objImage => {
+              if (objImage.getStrCharactere() == strCharactere) {
+                arrContainer.push(objImage);
+              }
+            });
+
+            return arrContainer;
+          }
+          else {
+            var retourne;
+
+            this.children.forEach(objImage => {
+              if (objImage.getStrCharactere() == strCharactere) {
+                retourne = objImage;
+              }
+            });
+
+            return retourne;
+          }
+        };
+        object_Stage.getChildCharacterePositionAt = function(strCharactere, x, y) {
+          var retourne;
+
+          this.children.forEach(objImage => {
+            if (objImage.getStrCharactere() == strCharactere && objImage.getX() == x && objImage.getY() == y) {
+              retourne = objImage;
+            }
+          });
+
+          return retourne;
+        };
+        object_Stage.getCharacterePositionAt = function(x, y) {
+          var retourne;
+
+          this.children.forEach(objImage => {
+            if (objImage.getX() == x && objImage.getY() == y) {
+              retourne = objImage.getStrCharactere();
+            }
+          });
+
+          return retourne;
+        };
+
+        object_Stage.showHitBoxes = function(object, strColor) {
+          /*objC2D.strokeStyle = 'white'; 
+          objC2D.beginPath();
+          objC2D.moveTo(objImage_1.getPixelX1(), objImage_1.getPixelY1());
+          objC2D.lineTo(objImage_1.getPixelX2(), objImage_1.getPixelY1());
+          objC2D.lineTo(objImage_1.getPixelX2(), objImage_1.getPixelY2());
+          objC2D.lineTo(objImage_1.getPixelX1(), objImage_1.getPixelY2());
+          objC2D.closePath();
+          objC2D.stroke();
+
+          objC2D.strokeStyle = 'yellow'; 
+          objC2D.beginPath();
+          objC2D.moveTo(objImage_2.getPixelX1(), objImage_2.getPixelY1());
+          objC2D.lineTo(objImage_2.getPixelX2(), objImage_2.getPixelY1());
+          objC2D.lineTo(objImage_2.getPixelX2(), objImage_2.getPixelY2());
+          objC2D.lineTo(objImage_2.getPixelX1(), objImage_2.getPixelY2());
+          objC2D.closePath();
+          objC2D.stroke();*/
+
+          objC2D.strokeStyle = strColor;
+          objC2D.beginPath();
+          objC2D.moveTo(object.getPixelX1(), object.getPixelY1());
+          objC2D.lineTo(object.getPixelX2(), object.getPixelY1());
+          objC2D.lineTo(object.getPixelX2(), object.getPixelY2());
+          objC2D.lineTo(object.getPixelX1(), object.getPixelY2());
+          objC2D.closePath();
+          objC2D.stroke();
+        };
+
+        object_Stage.collision = function(objImage_1, objImage_2, ...args) {
+          //this.showHitBoxes(objImage_1, "white");
+          //this.showHitBoxes(objImage_2, "yellow");
+
+          if (arguments.length == 2) {
+            return ((objImage_1.getPixelY2() > objImage_2.getPixelY1()) && 
+                  (objImage_1.getPixelY1() < objImage_2.getPixelY2()) &&
+                  (objImage_1.getPixelX2() > objImage_2.getPixelX1()) &&
+                  (objImage_1.getPixelX1() < objImage_2.getPixelX2()));
+          }
+          else {
+            return ((objImage_1.getPixelY2()+arguments[2] > objImage_2.getPixelY1()) && 
+                  (objImage_1.getPixelY1() < objImage_2.getPixelY2()) &&
+                  (objImage_1.getPixelX2() > objImage_2.getPixelX1()) &&
+                  (objImage_1.getPixelX1() < objImage_2.getPixelX2()));
+          }
+        };
+
         object_Stage.draw = function() {
           blackCanvas();
 
@@ -783,27 +844,29 @@
                 objImage.img.src = strSprite_Vide;
               }*/
 
-              if (objImage.getStrCharactere() == "@") {
-                objC2D.drawImage(
-                  objImage.img, 
-                  objJoueur.getTab_Image_Runner(0),
-                  objJoueur.getTab_Image_Runner(1),
-                  40,
-                  85,
-                  objImage.getPixelX1(),
-                  objImage.getPixelY1(),
-                  50,
-                  120
-                );
-              }
-              else {
-                objC2D.drawImage(
-                  objImage.img, 
-                  objImage.getX()*(objCanvas.width/intNum_Cell_X), 
-                  objImage.getY()*(objCanvas.height/intNum_Cell_Y), 
-                  52, 
-                  64
-                );
+              if (objImage.visible) {
+                if (objImage.getStrCharactere() == "@") {
+                  objC2D.drawImage(
+                    objImage.img, 
+                    objJoueur.getTab_Image_Runner(0),
+                    objJoueur.getTab_Image_Runner(1),
+                    40,
+                    85,
+                    objImage.getPixelX1(),
+                    objImage.getPixelY1(),
+                    50,
+                    120
+                  );
+                }
+                else {
+                  objC2D.drawImage(
+                    objImage.img, 
+                    objImage.getX()*(objCanvas.width/intNum_Cell_X), 
+                    objImage.getY()*(objCanvas.height/intNum_Cell_Y),
+                    52, 
+                    64
+                  );
+                }
               }
             }
           });
@@ -900,7 +963,7 @@
         object_Joueur.intPositionX2 = 40;
         object_Joueur.intPositionY2 = 44;*/
 
-        object_Joueur.binGauche = false;
+        //object_Joueur.binGauche = false;
 
         object_Joueur.tab_Image_Runner = null;
         object_Joueur.initTab_Images_Runner = function() {
@@ -954,67 +1017,143 @@
           objStage.setVisibleCharactere("@", true);
         };*/
 
+        /*
+          objImage.pixelX1 = x*(objCanvas.width/intNum_Cell_X);
+          objImage.pixelY1 = y*(objCanvas.height/intNum_Cell_Y);
+        */
+
         object_Joueur.moveRight = function() {
-          //objStage.getCharactereAt(this.intPositionX1*intNum_Cell_X/objCanvas.width, this.intPositionY1*intNum_Cell_Y/objCanvas.height);
+          //console.log(typeof objStage.getChildCharacterePositionAt("#", this.objImage.getX()+1, this.objImage.getY()));
+          //console.log(objStage.getCharacterePositionAt(this.objImage.getX()+1, this.objImage.getY()));
+          //console.log(typeof objStage.getChildCharacterePositionAt("#", this.objImage.getX(), this.objImage.getY()));
 
-          if (this.objImage.getPixelX2() < objCanvas.width) {
-            /*console.log(this.objImage.getPixelX1() + "x1, " + this.objImage.getPixelY1() + "y1\n" + 
-                        this.objImage.getPixelX2() + "x2, " + this.objImage.getPixelY2() + "y2");*/
+          //objStage.getChildCharactereAt("#").forEach(objImage => {
+            if (this.objImage.getPixelX2() < objCanvas.width /*&& (typeof objStage.getChildCharacterePositionAt("#", this.objImage.getX()+1, this.objImage.getY()) === 'undefined' ||
+                !objStage.collision(this.objImage, objStage.getChildCharacterePositionAt("#", this.objImage.getX()+1, this.objImage.getY())))*/) {
+              this.intOptions++;
+              this.binGauche = false;
+              this.intOptions = this.intOptions % 3;
+              
+              this.objImage.pixelX1 += 5;
 
-            this.intOptions++;
-            this.binGauche = false;
-            this.intOptions = this.intOptions % 3;
-            
-            this.objImage.pixelX1 += 5;
+              this.objImage.pixelX2 = this.objImage.getPixelX1() + intPixelWidthRunner;
 
-            this.objImage.pixelX2 = this.objImage.getPixelX1() + 40;
-          }
+              this.objImage.intX = Math.floor(this.objImage.getPixelX1()*intNum_Cell_X/objCanvas.width);
+              this.objImage.intY = Math.floor(this.objImage.getPixelY1()*intNum_Cell_Y/objCanvas.width);
+            }
+          //});
         };
         object_Joueur.moveLeft = function() {
-          //objStage.getCharactereAt(this.objImage.getX()-1, this.objImage.getY());
+          //console.log(typeof objStage.getChildCharacterePositionAt("#", this.objImage.getX()+1, this.objImage.getY()));
+          //console.log(objStage.getCharacterePositionAt(this.objImage.getX()-1, this.objImage.getY()));
+          //console.log(typeof objStage.getChildCharacterePositionAt("#", this.objImage.getX(), this.objImage.getY()));
 
-          if (this.objImage.getPixelX1() >= 0) {
-            /*console.log(this.objImage.getPixelX1() + "x1, " + this.objImage.getPixelY1() + "y1\n" + 
-                        this.objImage.getPixelX2() + "x2, " + this.objImage.getPixelY2() + "y2");*/
+          //objStage.getChildCharactereAt("#").forEach(objImage => {
+            if (this.objImage.getPixelX1() >= 0 /*&& (typeof objStage.getChildCharacterePositionAt("#", this.objImage.getX()+1, this.objImage.getY()) === 'undefined' ||
+                !objStage.collision(this.objImage, objStage.getChildCharacterePositionAt("#", this.objImage.getX()-1, this.objImage.getY())))*/) {
+              this.intOptions++;
+              this.binGauche = true;
+              this.intOptions = this.intOptions % 6;
+              
+              if (this.intOptions < 3) {
+                this.intOptions =+ 3;
+              }
+              
+              this.objImage.pixelX1 -= 5;
 
-            this.intOptions++;
-            this.binGauche = true;
-            this.intOptions = this.intOptions % 6;
-            
-            if (this.intOptions < 3) {
-              this.intOptions =+ 3;
+              this.objImage.pixelX2 = this.objImage.getPixelX1() + intPixelWidthRunner;
+
+              this.objImage.intX = Math.ceil(this.objImage.getPixelX1()*intNum_Cell_X/objCanvas.width);
+              this.objImage.intY = Math.ceil(this.objImage.getPixelY1()*intNum_Cell_Y/objCanvas.width);
             }
-            
-            this.objImage.pixelX1 -= 5;
-
-            this.objImage.pixelX2 = this.objImage.getPixelX1() - 40;
-          }
+          //});
         };
 
         object_Joueur.moveUp = function() {
-          //(this.objImage.getX() + 1)*(objCanvas.width/intNum_Cell_X);
-          //if ()
+          console.log(this.objImage.toString() + "\n" + objStage.getCharacterePositionAt(this.objImage.getX(), this.objImage.getY()-1));
 
-          //objStage.getCharactereAt(this.objImage.getX(), this.objImage.getY()-1);
+          objStage.getChildCharactereAt("H").forEach(objImage => {
+            if (this.objImage.getPixelY1() >= 0 && objStage.collision(this.objImage, objImage)) {
+              this.intOptions++;
+              this.intOptions = this.intOptions % 8;
+              
+              if (this.intOptions < 6) {
+                this.intOptions =+ 6;
+              }
 
-          if (this.objImage.getPixelY1() >= 0) {
-            /*console.log(this.objImage.getPixelX1() + "x1, " + this.objImage.getPixelY1() + "y1\n" + 
-                        this.objImage.getPixelX2() + "x2, " + this.objImage.getPixelY2() + "y2");*/
+              this.objImage.pixelY1 -= 5;
 
-            this.intOptions++;
-            this.intOptions = this.intOptions % 8;
-            
-            if (this.intOptions < 6) {
-              this.intOptions =+ 6;
+              this.objImage.pixelY2 = this.objImage.getPixelY1() + intPixelHeightRunner;
+
+              this.objImage.intX = Math.floor(this.objImage.getPixelX1()*intNum_Cell_X/objCanvas.width);
+              this.objImage.intY = Math.floor(this.objImage.getPixelY1()*intNum_Cell_Y/objCanvas.width);
             }
+          });
 
-            this.objImage.pixelY1 -= 5;
+          objStage.getChildCharactereAt("|").forEach(objImage => {
+            if (this.objImage.getPixelY1() >= 0 && objStage.collision(this.objImage, objImage)) {
+              this.intOptions++;
+              this.intOptions = this.intOptions % 8;
+              
+              if (this.intOptions < 6) {
+                this.intOptions =+ 6;
+              }
 
-            this.objImage.pixelY2 = this.objImage.getPixelY1() - 44;
-          }
+              this.objImage.pixelY1 -= 5;
+
+              this.objImage.pixelY2 = this.objImage.getPixelY1() + intPixelHeightRunner;
+
+              this.objImage.intX = Math.floor(this.objImage.getPixelX1()*intNum_Cell_X/objCanvas.width);
+              this.objImage.intY = Math.floor(this.objImage.getPixelY1()*intNum_Cell_Y/objCanvas.width);
+            }
+          });
         };
         object_Joueur.moveDown = function() {
+          //console.log(this.objImage.toString() + "\n" + objStage.getCharacterePositionAt(this.objImage.getX(), this.objImage.getY()+1));
 
+          objStage.getChildCharactereAt("H").forEach(objImage => {
+            if (this.objImage.getPixelY2() < objCanvas.height && 
+                objStage.collision(this.objImage, objImage, 2) /*&& 
+                objStage.getCharacterePositionAt(this.objImage.getX(), this.objImage.getY()-1) != "#"*/
+                /*!objStage.collision(this.objImage, objStage.getChildCharacterePositionAt("#", this.objImage.getX(), this.objImage.getY()+1))*/) {
+              if (objStage.getCharacterePositionAt(this.objImage.getX(), this.objImage.getY()+1) != "#") {
+
+                this.intOptions++;
+                this.intOptions = this.intOptions % 8;
+                
+                if (this.intOptions < 6) {
+                  this.intOptions =+ 6;
+                }
+
+                this.objImage.pixelY1 += 5;
+
+                this.objImage.pixelY2 = this.objImage.getPixelY1() + intPixelHeightRunner;
+
+                this.objImage.intX = Math.ceil(this.objImage.getPixelX1()*intNum_Cell_X/objCanvas.width);
+                this.objImage.intY = Math.ceil(this.objImage.getPixelY1()*intNum_Cell_Y/objCanvas.width);
+              }
+            }
+          });
+
+          objStage.getChildCharactereAt("|").forEach(objImage => {
+            if (this.objImage.getPixelY2() < objCanvas.height && 
+                objStage.collision(this.objImage, objImage, 2) && 
+                objStage.getCharacterePositionAt(this.objImage.getX(), this.objImage.getY()-1) != "#") {
+              this.intOptions++;
+              this.intOptions = this.intOptions % 8;
+              
+              if (this.intOptions < 6) {
+                this.intOptions =+ 6;
+              }
+
+              this.objImage.pixelY1 += 5;
+
+              this.objImage.pixelY2 = this.objImage.getPixelY1() + intPixelHeightRunner;
+
+              this.objImage.intX = Math.ceil(this.objImage.getPixelX1()*intNum_Cell_X/objCanvas.width);
+              this.objImage.intY = Math.ceil(this.objImage.getPixelY1()*intNum_Cell_Y/objCanvas.width);
+            }
+          });
         };
 
         object_Joueur.fall = function() {
@@ -1104,7 +1243,11 @@
                   "\t" + "charactere:\t" + this.strCharactere + ",\n" + 
                   "\t" + "x:\t" + this.intX + ",\n" + 
                   "\t" + "y:\t" + this.intY + ",\n" + 
-                  "\t" + "src:\t" + this.strSrc + 
+                  "\t" + "src:\t" + this.strSrc + ",\n" + 
+                  "\t" + "X1:\t" + this.pixelX1 + ",\n" + 
+                  "\t" + "Y1:\t" + this.pixelY1 + ",\n" + 
+                  "\t" + "X2:\t" + this.pixelX2 + ",\n" + 
+                  "\t" + "Y2:\t" + this.pixelY2 + ",\n" + 
                   "\n]\n\n";
         };
 
@@ -1177,7 +1320,8 @@
 
               break;
           case 40: // Flèche-en-bas
-            objJoueur.fall();
+            //objJoueur.fall();
+            objJoueur.moveDown();
 
             break;
           case 32: // Espace
