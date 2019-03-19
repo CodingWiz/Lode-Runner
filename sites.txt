@@ -1,0 +1,7 @@
+============================ COLLISIONS ==================================
+
+https://stackoverflow.com/questions/2440377/javascript-collision-detection
+
+https://en.wikipedia.org/wiki/Minimum_bounding_rectangle
+
+https://codepen.io/mixal_bl4/pen/qZYWOm

@@ -88,6 +88,7 @@
       // variables constantes
       const intNiveau_1 = 1, intNiveau_2 = 2, intNiveau_3 = 3;
       const intNum_Cell_X = 28, intNum_Cell_Y = 17;
+      const intPixelWidth = 40, intPixelHeight = 44;
 
       /* legende de la carte du niveau : 
           $ = or
@@ -228,6 +229,12 @@
             objImage.intX = x;
             objImage.intY = y;
 
+            objImage.pixelX1 = x*(objCanvas.width/intNum_Cell_X);
+            objImage.pixelY1 = y*(objCanvas.height/intNum_Cell_Y);
+
+            objImage.pixelX2 = objImage.pixelX1 + 40;
+            objImage.pixelY2 = objImage.pixelY1 + 44;
+
             objImage.visible = true;
             objImage.firstLoad = true;
 
@@ -256,6 +263,7 @@
 
                 objJoueur.objImage = objImage;
                 objJoueur.initTab_Images_Runner();
+                //objJoueur.initPosition();
 
                 break;
               case "!":
@@ -331,7 +339,7 @@
         objCanvas = document.getElementById('monCanvas');
         objC2D = objCanvas.getContext('2d');
 
-        blackCanvas();
+        //blackCanvas();
         objCanvas.focus();
         
         remettreVariables();
@@ -359,11 +367,12 @@
         //effacerDessin();
         //blackCanvas();
 
-        blackCanvas();
+        //blackCanvas();
 
         //objStage.clearDraw();
         //dessiner();
         objStage.draw();
+        //console.log("Animer: " + objJoueur.getintPositionX1() + "x, " + objJoueur.getintPositionY1() + "y");
         //objStage.clearDraw();
         //objJoueur.dessiner();
         //objJoueur.dessiner();
@@ -492,7 +501,7 @@
       /*function dessiner(){
         //objC2D.fillStyle='black';
         //objC2D.fillRect(0,0,objCanvas.width,objCanvas.height);
-        objC2D.drawImage(Image_Runner, tab_Image_Runner[intOptions][0],tab_Image_Runner[intOptions][1], 40,85, intPositionX,intPositionY, 40,85);
+        objC2D.drawImage(Image_Runner, tab_Image_Runner[intOptions][0],tab_Image_Runner[intOptions][1], 40,85, intPositionX1,intPositionY1, 40,85);
       }*/
 
       // fonction stage qui initialise l'objet stage et 
@@ -598,6 +607,14 @@
           this.children.forEach(objImage => {
             if (objImage.getStrCharactere() === strCharactere) {
               console.log(objImage.toString());
+            }
+          });
+        };
+
+        object_Stage.getCharactereAt = function(x, y) {
+          this.children.forEach(objImage => {
+            if (objImage.getX() == x && objImage.getY() == y) {
+              console.log(objImage.getStrCharactere());
             }
           });
         };
@@ -719,6 +736,8 @@
         };
 
         object_Stage.draw = function() {
+          blackCanvas();
+
           this.children.forEach(objImage => {
             if (objImage.firstLoad) {
               var image = new Image();
@@ -726,20 +745,16 @@
               if (objImage.getStrCharactere() == "@") {
                 image.onload = function() {
                   objC2D.drawImage(
-                  image, 
-                  /*objImage.getX()*(objCanvas.width/intNum_Cell_X),
-                  objImage.getY()*(objCanvas.height/intNum_Cell_Y),
-                  52,
-                  64*/
-                  objJoueur.getTab_Image_Runner(0),
-                  objJoueur.getTab_Image_Runner(1),
-                  40,
-                  85,
-                  objJoueur.getIntPositionX(),
-                  objJoueur.getIntPositionY(),
-                  40,
-                  85
-                );
+                    image, 
+                    objJoueur.getTab_Image_Runner(0),
+                    objJoueur.getTab_Image_Runner(1),
+                    40,
+                    85,
+                    objImage.getPixelX1(),
+                    objImage.getPixelY1(),
+                    40,
+                    85
+                  );
                 }
               }
               else {
@@ -775,10 +790,10 @@
                   objJoueur.getTab_Image_Runner(1),
                   40,
                   85,
-                  objJoueur.getIntPositionX(),
-                  objJoueur.getIntPositionY(),
-                  40,
-                  85
+                  objImage.getPixelX1(),
+                  objImage.getPixelY1(),
+                  50,
+                  120
                 );
               }
               else {
@@ -861,8 +876,8 @@
         var tab_Image_Text=new Array(60);
         var Image_Trap = new Image();
         var intOptions=0;
-        var intPositionX=0;
-        var intPositionY=40;
+        var intPositionX1=0;
+        var intPositionY1=40;
         var binGauche=false;
       */
 
@@ -879,8 +894,11 @@
 
         object_Joueur.intOptions = 0;
 
-        object_Joueur.intPositionX = 0;
-        object_Joueur.intPositionY = 40;
+        /*object_Joueur.intPositionX1 = 0; //800;
+        object_Joueur.intPositionY1 = 0; //900;
+
+        object_Joueur.intPositionX2 = 40;
+        object_Joueur.intPositionY2 = 44;*/
 
         object_Joueur.binGauche = false;
 
@@ -900,84 +918,99 @@
           }
         };
 
-        object_Joueur.getIntPositionX = function() {
-          return this.intPositionX;
+        /*object_Joueur.initPosition = function() {
+          this.intPositionX1 = this.objImage.getX()*(objCanvas.width/intNum_Cell_X);
+          this.intPositionY1 = this.objImage.getY()*(objCanvas.height/intNum_Cell_Y);
+
+          this.intPositionX2 = this.intPositionX1 + 40;
+          this.intPositionY2 = this.intPositionY1 + 44;
+        };*/
+
+        /*object_Joueur.getintPositionX1 = function() {
+          return this.intPositionX1;
         };
-        object_Joueur.getIntPositionY = function() {
-          return this.intPositionY;
-        };
+        object_Joueur.getintPositionY1 = function() {
+          return this.intPositionY1;
+        };*/
+
         object_Joueur.getTab_Image_Runner = function(x) {
           return this.tab_Image_Runner[this.intOptions][x];
         };
 
-        object_Joueur.dessiner = function() {
+        /*object_Joueur.dessiner = function() {
           //objStage.removeAllImageCharactere("@");
-          /*objC2D.drawImage(
+          objC2D.drawImage(
             this.objImage.img, 
             this.tab_Image_Runner[this.intOptions][0],
             this.tab_Image_Runner[this.intOptions][1],
             40,
             85,
-            this.intPositionX,
-            this.intPositionY,
+            this.intPositionX1,
+            this.intPositionY1,
             40,
             85
-          );*/
+          );
           
           objStage.setVisibleCharactere("@", true);
-        };
+        };*/
 
         object_Joueur.moveRight = function() {
-          /*objC2D.fillStyle='black';
-          objC2D.fillRect(this.intPositionX, this.intPositionY, this.intPositionX+1, this.intPositionY+1);*/
-          //this.objImage.img.src = strSprite_Vide;
+          //objStage.getCharactereAt(this.intPositionX1*intNum_Cell_X/objCanvas.width, this.intPositionY1*intNum_Cell_Y/objCanvas.height);
 
-          /*objC2D.drawImage(
-            image_Empty(), 
-            this.tab_Image_Runner[this.intOptions][0],
-            this.tab_Image_Runner[this.intOptions][1],
-            40,
-            85,
-            this.intPositionX,
-            this.intPositionY,
-            40,
-            85
-          );*/
+          if (this.objImage.getPixelX2() < objCanvas.width) {
+            /*console.log(this.objImage.getPixelX1() + "x1, " + this.objImage.getPixelY1() + "y1\n" + 
+                        this.objImage.getPixelX2() + "x2, " + this.objImage.getPixelY2() + "y2");*/
 
-          //image_Empty(this.tab_Image_Runner[this.intOptions][0], this.tab_Image_Runner[this.intOptions][1], 40, 85);
+            this.intOptions++;
+            this.binGauche = false;
+            this.intOptions = this.intOptions % 3;
+            
+            this.objImage.pixelX1 += 5;
 
-          //this.objImage.img.src = strSprite_Vide;
-
-          //objStage.removeAllImageCharactere("@");
-          
-          //objStage.setVisibleCharactere("@", false);
-
-          this.intOptions++;
-          this.binGauche = false;
-          this.intOptions = this.intOptions % 3;
-          
-          this.intPositionX += 5;
-
-          //objStage.setVisibleCharactere("@", true);
+            this.objImage.pixelX2 = this.objImage.getPixelX1() + 40;
+          }
         };
         object_Joueur.moveLeft = function() {
-          this.intOptions++;
-          this.binGauche = true;
-          this.intOptions = this.intOptions % 6;
-          
-          if (this.intOptions < 3) {
-            this.intOptions =+ 3;
+          //objStage.getCharactereAt(this.objImage.getX()-1, this.objImage.getY());
+
+          if (this.objImage.getPixelX1() >= 0) {
+            /*console.log(this.objImage.getPixelX1() + "x1, " + this.objImage.getPixelY1() + "y1\n" + 
+                        this.objImage.getPixelX2() + "x2, " + this.objImage.getPixelY2() + "y2");*/
+
+            this.intOptions++;
+            this.binGauche = true;
+            this.intOptions = this.intOptions % 6;
+            
+            if (this.intOptions < 3) {
+              this.intOptions =+ 3;
+            }
+            
+            this.objImage.pixelX1 -= 5;
+
+            this.objImage.pixelX2 = this.objImage.getPixelX1() - 40;
           }
-          
-          this.intPositionX -= 5;
         };
 
         object_Joueur.moveUp = function() {
-          this.intOptions++;
-          this.intOptions = this.intOptions % 8;
-          
-          if (this.intOptions < 6) {
-            this.intOptions =+ 6;
+          //(this.objImage.getX() + 1)*(objCanvas.width/intNum_Cell_X);
+          //if ()
+
+          //objStage.getCharactereAt(this.objImage.getX(), this.objImage.getY()-1);
+
+          if (this.objImage.getPixelY1() >= 0) {
+            /*console.log(this.objImage.getPixelX1() + "x1, " + this.objImage.getPixelY1() + "y1\n" + 
+                        this.objImage.getPixelX2() + "x2, " + this.objImage.getPixelY2() + "y2");*/
+
+            this.intOptions++;
+            this.intOptions = this.intOptions % 8;
+            
+            if (this.intOptions < 6) {
+              this.intOptions =+ 6;
+            }
+
+            this.objImage.pixelY1 -= 5;
+
+            this.objImage.pixelY2 = this.objImage.getPixelY1() - 44;
           }
         };
         object_Joueur.moveDown = function() {
@@ -1018,24 +1051,6 @@
         return object_Joueur;
       }
 
-      function image_Empty() {
-        var img = new Image();
-
-        img.onload = function(/*intPositionX, intPositionY, intTransformX, intTransformY*/) {
-          /*objC2D.drawImage(
-            img, 
-            intPositionX, 
-            intPositionY, 
-            intTransformX, 
-            intTransformY
-          );*/
-        }
-
-        img.src = strSprite_Vide;
-
-        return img;
-      }
-
       function object_Images() {
         var object_Images = {};
 
@@ -1047,6 +1062,37 @@
 
         object_Images.firstLoad = null;
         object_Images.visible = null;
+
+        object_Images.pixelX1 = null;
+        object_Images.pixelY1 = null;
+        object_Images.pixelX2 = null;
+        object_Images.pixelY2 = null;
+
+        object_Images.getPixelX1 = function() {
+          return this.pixelX1;
+        };
+        object_Images.getPixelY1 = function() {
+          return this.pixelY1;
+        };
+        object_Images.getPixelX2 = function() {
+          return this.pixelX2;
+        };
+        object_Images.getPixelY2 = function() {
+          return this.pixelY2;
+        };
+
+        /*object_Images.setPixelX1 = function(x1) {
+          this.pixelX1 = x1;
+        };
+        object_Images.setPixelY1 = function(y1) {
+          this.pixelY1 = y1;
+        };
+        object_Images.setPixelX2 = function(x2) {
+          this.pixelX2 = this.pixelX1 + x2;
+        };
+        object_Images.setPixelY2 = function(y2) {
+          this.pixelY2 = this.pixelY1 + y2;
+        };*/
 
         object_Images.getImg = function() {
           return this.img;
@@ -1076,6 +1122,27 @@
         };
         object_Images.getImg = function() {
           return this.img;
+        };
+
+        object_Images.setX = function(x) {
+          this.intX = x;
+        };
+        object_Images.setY = function(y) {
+          this.intY = y;
+        };
+
+        object_Images.incrementX = function() {
+          this.intX++;
+        };
+        object_Images.incrementY = function() {
+          this.intY++;
+        };
+
+        object_Images.decrementX = function() {
+          this.intX--;
+        };
+        object_Images.decrementY = function() {
+          this.intY--;
         };
 
         return object_Images;
