@@ -19,7 +19,7 @@
       const intPixelWidthCorde = 50, intPixelHeightCorde = 66;
       const intPixelWidthBrique = 55, intPixelHeightBrique = 66;
 
-      const intVitesseRunner = 5;
+      const intVitesseRunner = 5, intVitesseGarde = 5;
 
       /* legende de la carte du niveau : 
           $ = or
@@ -75,6 +75,10 @@
           intNiveau_Courant = 0, // niveau courant du joueur
           intOr_Count = 0, // compte le nombre d'or qu'il y a dans le jeu
           intGarde_Count = 0; // compte le nombre de garde qu'il y a dans le jeu
+
+      var intScore = 250;
+      var objDateInitiale = new Date().getTime();
+      var intVies = 5;
 
 
       // remettre les variables globales aux valeurs par defaut
@@ -867,6 +871,32 @@
               }
             }
           });
+
+          /*var objDateFinale = new Date().getTime();
+
+          var timeDiff = objDateFinale - objDateInitiale; 
+          
+          var secDiff = objDateFinale.getSeconds() - objDateInitiale.getSeconds();
+          var minDiff = objDateFinale.getMinutes() - objDateInitiale.getMinutes();
+          /*d.setSeconds((secDiff/1000)%60);
+          d.setMinutes((secDiff/60000)%60);*/
+
+          //console.log(secDiff);
+         
+        
+          /*var str = "" + intScore;
+          var pad = "0000000";
+
+          var strScore = pad.substring(0, pad.length - str.length) + str;
+          //var minDiff = (secDiff/1000) % 60; //d.getMinutes.toString();
+          //minDiff = pad.substring(0, 2-minDiff.length) + minDiff;
+          //var secDiffs=d.getSeconds;
+
+          var text="SCORE: " + strScore + "    TEMPS: " + ('0'+minDiff).slice(-2) + ":" + ('0'+secDiff).slice(-2) + "    NIVEAU: " + intNiveau_Courant + "    VIES: 1";
+
+          objC2D.fillStyle="white";
+          objC2D.font = '35pt Verdana';
+          objC2D.fillText(text, 40, 1070); */
         };
 
         // !!! NE PAS UTILISER. LE CODE NE MARCHE PAS. UTILISER blackCanvas() AVEC objStage.draw() !!!
