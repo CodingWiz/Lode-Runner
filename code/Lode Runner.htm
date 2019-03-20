@@ -19,6 +19,8 @@
       const intPixelWidthCorde = 50, intPixelHeightCorde = 66;
       const intPixelWidthBrique = 55, intPixelHeightBrique = 66;
 
+      const intVitesseRunner = 5;
+
       /* legende de la carte du niveau : 
           $ = or
           @ = Joueur
@@ -283,8 +285,8 @@
         objStage.draw();
 
         //objStage.getConsoleImageIndexAt("H");
-        //console.log(objStage.getChildCharacterePositionAt("$", 17, 14));
-        //console.log(objStage.collision(objJoueur.objImage, objStage.getChildCharacterePositionAt("$", 17, 14)));
+        //console.log(objStage.getChildFromCharacterePositionAt("$", 17, 14));
+        //console.log(objStage.collision(objJoueur.objImage, objStage.getChildFromCharacterePositionAt("$", 17, 14)));
 
         animer();
       }
@@ -324,23 +326,18 @@
           }); 
         }
 
-        objStage.showHitBoxes(objJoueur.objImage, "white");
+        //objJoueur.fall();
+
+        /*objStage.showHitBoxes(objJoueur.objImage, "white");
         objStage.getChildCharactereAt("H").forEach(objImage => {
           objStage.showHitBoxes(objImage, "yellow");
         });
         objStage.getChildCharactereAt("#").forEach(objImage => {
           objStage.showHitBoxes(objImage, "red");
-        });
-
-        //console.log(objJoueur.objImage.getX() + "x, " + objJoueur.objImage.getY() + "y");
-
-        //objStage.getConsoleImageIndexAt("$");
-        //console.log(objStage.getChildCharacterePositionAt("$", 17, 14));
-        //console.log(objStage.collision(objJoueur.objImage, objStage.getChildCharacterePositionAt("$", 17, 14)));
-
-        /*objStage.getChildCharactereAt("H").forEach(objImage => {
-          console.log(objStage.collision(objJoueur.objImage, objImage));
         });*/
+
+        /*console.log("\"" + objStage.getCharacterePositionAt(objJoueur.objImage.getX()+1, objJoueur.objImage.getY()) + "\"" + " : " +
+                    objJoueur.objImage.getX() + "x, " + objJoueur.objImage.getY() + "y");*/
       }
       function effacerDessin() {
 	      objC2D.clearRect(0, 0, objCanvas.width, objCanvas.height); 
@@ -703,7 +700,7 @@
         };
 
         object_Stage.getChildCharactereAt = function(strCharactere) {
-          if (strCharactere == "$" || strCharactere == "|" || strCharactere == "H" || strCharactere == "-" || strCharactere == "#") {
+          if (strCharactere == "$" || strCharactere == "|" || strCharactere == "H" || strCharactere == "-" || strCharactere == "#" || strCharactere == "!") {
             var arrContainer = [];
 
             this.children.forEach(objImage => {
@@ -726,7 +723,7 @@
             return retourne;
           }
         };
-        object_Stage.getChildCharacterePositionAt = function(strCharactere, x, y) {
+        object_Stage.getChildFromCharacterePositionAt = function(strCharactere, x, y) {
           var retourne;
 
           this.children.forEach(objImage => {
@@ -957,6 +954,8 @@
 
         object_Joueur.intOptions = 0;
 
+        object_Joueur.action = "@";
+
         /*object_Joueur.intPositionX1 = 0; //800;
         object_Joueur.intPositionY1 = 0; //900;
 
@@ -1023,55 +1022,81 @@
         */
 
         object_Joueur.moveRight = function() {
-          //console.log(typeof objStage.getChildCharacterePositionAt("#", this.objImage.getX()+1, this.objImage.getY()));
-          //console.log(objStage.getCharacterePositionAt(this.objImage.getX()+1, this.objImage.getY()));
-          //console.log(typeof objStage.getChildCharacterePositionAt("#", this.objImage.getX(), this.objImage.getY()));
+          if (this.objImage.getPixelX2() < objCanvas.width &&
+              (objStage.getCharacterePositionAt(this.objImage.getX()+1, this.objImage.getY()) != "#" ||
+                (objStage.getCharacterePositionAt(this.objImage.getX()+1, this.objImage.getY()) == "#" &&
+                !objStage.collision(this.objImage, objStage.getChildFromCharacterePositionAt("#", this.objImage.getX()+1, this.objImage.getY()))))) {
+            this.intOptions++;
+            this.binGauche = false;
 
-          //objStage.getChildCharactereAt("#").forEach(objImage => {
-            if (this.objImage.getPixelX2() < objCanvas.width /*&& (typeof objStage.getChildCharacterePositionAt("#", this.objImage.getX()+1, this.objImage.getY()) === 'undefined' ||
-                !objStage.collision(this.objImage, objStage.getChildCharacterePositionAt("#", this.objImage.getX()+1, this.objImage.getY())))*/) {
-              this.intOptions++;
-              this.binGauche = false;
-              this.intOptions = this.intOptions % 3;
-              
-              this.objImage.pixelX1 += 5;
+            objStage.getChildCharactereAt("-").forEach(objImageCorde => {
+              if (objStage.getCharacterePositionAt(this.objImage.getX()+1, this.objImage.getY()) == "-" &&
+                  objStage.collision(this.objImage, objStage.getChildFromCharacterePositionAt("-", this.objImage.getX()+1, this.objImage.getY()))) {
+                this.intOptions = this.intOptions % 12;
 
-              this.objImage.pixelX2 = this.objImage.getPixelX1() + intPixelWidthRunner;
+                if (this.intOptions < 9){
+                  this.intOptions =+ 9;
+                }
 
-              this.objImage.intX = Math.floor(this.objImage.getPixelX1()*intNum_Cell_X/objCanvas.width);
-              this.objImage.intY = Math.floor(this.objImage.getPixelY1()*intNum_Cell_Y/objCanvas.width);
-            }
-          //});
+                this.action = "-";
+              }
+              else {
+                this.intOptions = this.intOptions % 3;
+
+                this.action = "@";
+              }
+
+              return;
+            });
+            
+            this.objImage.pixelX1 += 5;
+
+            this.objImage.pixelX2 = this.objImage.getPixelX1() + intPixelWidthRunner;
+
+            this.objImage.intX = Math.floor(this.objImage.getPixelX1()*intNum_Cell_X/objCanvas.width);
+          }
         };
         object_Joueur.moveLeft = function() {
-          //console.log(typeof objStage.getChildCharacterePositionAt("#", this.objImage.getX()+1, this.objImage.getY()));
-          //console.log(objStage.getCharacterePositionAt(this.objImage.getX()-1, this.objImage.getY()));
-          //console.log(typeof objStage.getChildCharacterePositionAt("#", this.objImage.getX(), this.objImage.getY()));
+          if (this.objImage.getPixelX1() >= 0 &&
+              (objStage.getCharacterePositionAt(this.objImage.getX()-1, this.objImage.getY()) != "#" ||
+                (objStage.getCharacterePositionAt(this.objImage.getX()-1, this.objImage.getY()) == "#" &&
+                !objStage.collision(this.objImage, objStage.getChildFromCharacterePositionAt("#", this.objImage.getX()-1, this.objImage.getY()))))) {
+            this.intOptions++;
+            this.binGauche = true;
+            
+            objStage.getChildCharactereAt("-").forEach(objImageCorde => {
+              if (objStage.getCharacterePositionAt(this.objImage.getX()-1, this.objImage.getY()) == "-" &&
+                  objStage.collision(this.objImage, objStage.getChildFromCharacterePositionAt("-", this.objImage.getX()-1, this.objImage.getY()))) {
+                  this.intOptions = this.intOptions % 15;
 
-          //objStage.getChildCharactereAt("#").forEach(objImage => {
-            if (this.objImage.getPixelX1() >= 0 /*&& (typeof objStage.getChildCharacterePositionAt("#", this.objImage.getX()+1, this.objImage.getY()) === 'undefined' ||
-                !objStage.collision(this.objImage, objStage.getChildCharacterePositionAt("#", this.objImage.getX()-1, this.objImage.getY())))*/) {
-              this.intOptions++;
-              this.binGauche = true;
-              this.intOptions = this.intOptions % 6;
-              
-              if (this.intOptions < 3) {
-                this.intOptions =+ 3;
+                if (this.intOptions < 12){
+                  this.intOptions =+ 12;
+                }
+
+                this.action = "-";
               }
-              
-              this.objImage.pixelX1 -= 5;
+              else {
+                this.intOptions = this.intOptions % 6;
 
-              this.objImage.pixelX2 = this.objImage.getPixelX1() + intPixelWidthRunner;
+                if (this.intOptions < 3) {
+                  this.intOptions =+ 3;
+                }
 
-              this.objImage.intX = Math.ceil(this.objImage.getPixelX1()*intNum_Cell_X/objCanvas.width);
-              this.objImage.intY = Math.ceil(this.objImage.getPixelY1()*intNum_Cell_Y/objCanvas.width);
-            }
-          //});
+                this.action = "@";
+              }
+
+              return;
+            });
+            
+            this.objImage.pixelX1 -= 5;
+
+            this.objImage.pixelX2 = this.objImage.getPixelX1() + intPixelWidthRunner;
+
+            this.objImage.intX = Math.ceil(this.objImage.getPixelX1()*intNum_Cell_X/objCanvas.width);
+          }
         };
 
         object_Joueur.moveUp = function() {
-          console.log(this.objImage.toString() + "\n" + objStage.getCharacterePositionAt(this.objImage.getX(), this.objImage.getY()-1));
-
           objStage.getChildCharactereAt("H").forEach(objImage => {
             if (this.objImage.getPixelY1() >= 0 && objStage.collision(this.objImage, objImage)) {
               this.intOptions++;
@@ -1085,9 +1110,15 @@
 
               this.objImage.pixelY2 = this.objImage.getPixelY1() + intPixelHeightRunner;
 
-              this.objImage.intX = Math.floor(this.objImage.getPixelX1()*intNum_Cell_X/objCanvas.width);
-              this.objImage.intY = Math.floor(this.objImage.getPixelY1()*intNum_Cell_Y/objCanvas.width);
+              this.objImage.intY = Math.ceil(this.objImage.getPixelY1()*intNum_Cell_Y/objCanvas.height);
+
+              this.action = "H";
+
+              return;
             }
+            /*else {
+              this.action = null;
+            }*/
           });
 
           objStage.getChildCharactereAt("|").forEach(objImage => {
@@ -1103,21 +1134,74 @@
 
               this.objImage.pixelY2 = this.objImage.getPixelY1() + intPixelHeightRunner;
 
-              this.objImage.intX = Math.floor(this.objImage.getPixelX1()*intNum_Cell_X/objCanvas.width);
-              this.objImage.intY = Math.floor(this.objImage.getPixelY1()*intNum_Cell_Y/objCanvas.width);
+              this.objImage.intY = Math.ceil(this.objImage.getPixelY1()*intNum_Cell_Y/objCanvas.height);
+
+              this.action = "|";
+
+              return;
             }
+            /*else {
+              this.action = null;
+            }*/
           });
         };
         object_Joueur.moveDown = function() {
-          //console.log(this.objImage.toString() + "\n" + objStage.getCharacterePositionAt(this.objImage.getX(), this.objImage.getY()+1));
+          /*var blnSurLaCorde = false;
 
-          objStage.getChildCharactereAt("H").forEach(objImage => {
-            if (this.objImage.getPixelY2() < objCanvas.height && 
-                objStage.collision(this.objImage, objImage, 2) /*&& 
-                objStage.getCharacterePositionAt(this.objImage.getX(), this.objImage.getY()-1) != "#"*/
-                /*!objStage.collision(this.objImage, objStage.getChildCharacterePositionAt("#", this.objImage.getX(), this.objImage.getY()+1))*/) {
-              if (objStage.getCharacterePositionAt(this.objImage.getX(), this.objImage.getY()+1) != "#") {
+          objStage.getChildCharactereAt("-").forEach(objImageCorde => {
+            if (objStage.getCharacterePositionAt(this.objImage.getX()+1, this.objImage.getY()) == "-" &&
+                  objStage.collision(this.objImage, objStage.getChildFromCharacterePositionAt("-", this.objImage.getX()+1, this.objImage.getY()))) {
+              blnSurLaCorde = true;
 
+              return;
+            }
+
+            if (objStage.getCharacterePositionAt(this.objImage.getX()-1, this.objImage.getY()) == "-" &&
+                objStage.collision(this.objImage, objStage.getChildFromCharacterePositionAt("-", this.objImage.getX()-1, this.objImage.getY()))) {
+              blnSurLaCorde = true;
+
+              return;
+            }
+          });
+
+          if (blnSurLaCorde) {
+            this.action = "@";
+
+            this.fall();
+          }
+          else {*/
+            objStage.getChildCharactereAt("H").forEach(objImage => {
+              if (this.objImage.getPixelY2() < objCanvas.height && 
+                  objStage.collision(this.objImage, objImage, 5) && 
+                    ((objStage.getCharacterePositionAt(this.objImage.getX(), this.objImage.getY()+1) != "#" && objStage.getCharacterePositionAt(this.objImage.getX(), this.objImage.getY()+1) != " ") ||
+                    (objStage.getCharacterePositionAt(this.objImage.getX(), this.objImage.getY()+1) == "#" && !objStage.collision(this.objImage, objStage.getChildFromCharacterePositionAt("#", this.objImage.getX(), this.objImage.getY()+1))))) {
+                  this.intOptions++;
+                  this.intOptions = this.intOptions % 8;
+                  
+                  if (this.intOptions < 6) {
+                    this.intOptions =+ 6;
+                  }
+
+                  this.objImage.pixelY1 += 5;
+
+                  this.objImage.pixelY2 = this.objImage.getPixelY1() + intPixelHeightRunner;
+
+                  this.objImage.intY = Math.floor(this.objImage.getPixelY1()*intNum_Cell_Y/objCanvas.height);
+
+                  this.action = "H";
+
+                  return;
+                }
+                /*else {
+                  this.action = null;
+                }*/
+            });
+
+            objStage.getChildCharactereAt("|").forEach(objImage => {
+              if (this.objImage.getPixelY2() < objCanvas.height && 
+                  objStage.collision(this.objImage, objImage, 2) && 
+                    ((objStage.getCharacterePositionAt(this.objImage.getX(), this.objImage.getY()+1) != "#" && objStage.getCharacterePositionAt(this.objImage.getX(), this.objImage.getY()+1) != " ") ||
+                    (objStage.getCharacterePositionAt(this.objImage.getX(), this.objImage.getY()+1) == "#" && !objStage.collision(this.objImage, objStage.getChildFromCharacterePositionAt("#", this.objImage.getX(), this.objImage.getY()+1))))) {
                 this.intOptions++;
                 this.intOptions = this.intOptions % 8;
                 
@@ -1129,50 +1213,42 @@
 
                 this.objImage.pixelY2 = this.objImage.getPixelY1() + intPixelHeightRunner;
 
-                this.objImage.intX = Math.ceil(this.objImage.getPixelX1()*intNum_Cell_X/objCanvas.width);
-                this.objImage.intY = Math.ceil(this.objImage.getPixelY1()*intNum_Cell_Y/objCanvas.width);
+                this.objImage.intY = Math.floor(this.objImage.getPixelY1()*intNum_Cell_Y/objCanvas.height);
+
+                this.action = "|";
+
+                return;
               }
-            }
-          });
-
-          objStage.getChildCharactereAt("|").forEach(objImage => {
-            if (this.objImage.getPixelY2() < objCanvas.height && 
-                objStage.collision(this.objImage, objImage, 2) && 
-                objStage.getCharacterePositionAt(this.objImage.getX(), this.objImage.getY()-1) != "#") {
-              this.intOptions++;
-              this.intOptions = this.intOptions % 8;
-              
-              if (this.intOptions < 6) {
-                this.intOptions =+ 6;
-              }
-
-              this.objImage.pixelY1 += 5;
-
-              this.objImage.pixelY2 = this.objImage.getPixelY1() + intPixelHeightRunner;
-
-              this.objImage.intX = Math.ceil(this.objImage.getPixelX1()*intNum_Cell_X/objCanvas.width);
-              this.objImage.intY = Math.ceil(this.objImage.getPixelY1()*intNum_Cell_Y/objCanvas.width);
-            }
-          });
+              /*else {
+                this.action = null;
+              }*/
+            });
+          //}
         };
 
         object_Joueur.fall = function() {
-          if (this.binGauche) {
-            this.intOptions = 17;
+          if (this.action == "@" && 
+              (objStage.getCharacterePositionAt(this.objImage.getX(), this.objImage.getY()+1) == " " ||
+                  (objStage.getCharacterePositionAt(this.objImage.getX(), this.objImage.getY()+1) == "#" && 
+                  !objStage.collision(this.objImage, objStage.getChildFromCharacterePositionAt("#", this.objImage.getX(), this.objImage.getY()+1))))) {
+            this.intOptions++;
+
+            if (this.binGauche) {
+              this.intOptions = 17;
+            }
+            else {
+              this.intOptions = 8;
+            }
+
+            this.objImage.pixelY1 += 5;
+
+            this.objImage.pixelY2 = this.objImage.getPixelY1() + intPixelHeightRunner;
+
+            this.objImage.intY = Math.floor(this.objImage.getPixelY1()*intNum_Cell_Y/objCanvas.height);
           }
-          else {
-            this.intOptions = 8;
-          }
         };
 
-        object_Joueur.moveRightRope = function() {
-
-        };
-        object_Joueur.moveLeftRope = function() {
-
-        };
-
-        object_Joueur.remove = function() {
+        object_Joueur.removeBrick = function() {
           if (this.binGauche) {
             this.intOptions=16;
           }
@@ -1248,7 +1324,7 @@
                   "\t" + "Y1:\t" + this.pixelY1 + ",\n" + 
                   "\t" + "X2:\t" + this.pixelX2 + ",\n" + 
                   "\t" + "Y2:\t" + this.pixelY2 + ",\n" + 
-                  "\n]\n\n";
+                  "\n]\n";
         };
 
         object_Images.getStrCharactere = function() {
@@ -1325,7 +1401,7 @@
 
             break;
           case 32: // Espace
-            objJoueur.remove();
+            objJoueur.removeBrick();
 
             break;
         }
