@@ -13,11 +13,11 @@
       const intNum_Cell_X = 28, intNum_Cell_Y = 17;
 
       const intPixelWidthOr = 35, intPixelHeightOr = 42;
-      const intPixelWidthRunner = 50, intPixelHeightRunner = 65;
+      const intPixelWidthRunner = 50, intPixelHeightRunner = 60;
       const intPixelWidthGarde = 50, intPixelHeightGarde = 66;
       const intPixelWidthEscalier = 50, intPixelHeightEscalier = 66;
       const intPixelWidthCorde = 50, intPixelHeightCorde = 66;
-      const intPixelWidthBrique = 55, intPixelHeightBrique = 66;
+      const intPixelWidthBrique = 50, intPixelHeightBrique = 65;
 
       const intVitesseRunner = 5, intVitesseGarde = 5;
 
@@ -36,20 +36,20 @@
       const arrNiveau_Map = [ 
         "                  |         " + // carte du niveau 1
         "    $             |         " +
-        "#######H#######   |         " +
+        "1#####2H1#####2   |         " +
         "       H----------|    $    " +
-        "       H    ##H   #######H##" +
-        "       H    ##H          H  " +
-        "     ! H    ##H       $! H  " +
-        "##H#####    ########H#######" +
+        "       H    12H   1#####2H12" +
+        "       H    12H          H  " +
+        "     ! H    12H       $! H  " +
+        "12H1###2    1######2H1#####2" +
         "  H                 H       " +
         "  H           !     H       " +
-        "#########H##########H       " +
+        "1#######2H1########2H       " +
         "         H          H       " +
         "       $ H----------H   $   " +
-        "    H######         #######H" +
+        "    H1####2         1#####2H" +
         "    H         @  $         H" +
-        "############################" + 
+        "1##########################2" + 
         "~~~~~~~~~~~~~~~~~~~~~~~~~~~~" 
       ];
       // constantes globales qui contiennent les photos/sprites
@@ -71,14 +71,16 @@
       var objStage = null; 
 
       var objJoueur = null, // lode runner que le Joueur controle
-          //objMap = null, // representation des cellules dans un tableau array en 2d
+          objMap = null, // representation des cellules dans un tableau array en 2d
           intNiveau_Courant = 0, // niveau courant du joueur
           intOr_Count = 0, // compte le nombre d'or qu'il y a dans le jeu
           intGarde_Count = 0; // compte le nombre de garde qu'il y a dans le jeu
 
-      var intScore = 250;
+      var intScore = 0;
       var objDateInitiale = new Date().getTime();
       var intVies = 5;
+
+      var objBrickCollision = null;
 
 
       // remettre les variables globales aux valeurs par defaut
@@ -92,10 +94,11 @@
         });
 
         // redefini la fonction joueur et le met dans la variable objJoueur
-        objJoueur = object_Joueur({
-        });
+        objJoueur = object_Joueur({});
 
-        //objMap = [[]];
+        objBrickCollision = object_BrickCollision({});
+
+        objMap = [[]];
 
         // niveau 1 par defaut
         intNiveau_Courant = intNiveau_1; 
@@ -108,6 +111,15 @@
       function construireNiveau(niveau) {
         // retourne le charactere aux positions (x,y) du niveau
         var intNiveau_Charactere_Count = 0; 
+
+        for (var x = 0; x < intNum_Cell_X; x++) {
+          objMap[x] = []; 
+
+          for (var y = 0; y < intNum_Cell_Y; y++) 
+            objMap[x][y] = {};
+        }
+
+        var objBrick;
 
         // parcours les cellules horizontales
         for (var y = 0; y < intNum_Cell_Y; y++) { 
@@ -125,12 +137,15 @@
             
             var objImage = object_Images({
             });
-            objImage.strCharactere = strNiveau_Charactere,
+            objImage.strCharactere = strNiveau_Charactere;
             objImage.intX = x;
             objImage.intY = y;
 
             objImage.visible = true;
             objImage.firstLoad = true;
+
+            //objMap.strCharactere = strNiveau_Charactere;
+            objMap[x][y].strCharactere = strNiveau_Charactere;
 
             switch(strNiveau_Charactere) {
               /* legende de la carte du niveau : 
@@ -231,6 +246,43 @@
                 objImage.pixelY2 = objImage.getPixelY1() + intPixelHeightBrique;
 
                 break;
+
+              case "1":
+                objBrick = object_brick({});
+
+                objImage.strCharactere = "#";
+                objImage.strSrc = strSprite_Brique;
+                //objImage.img = initImage(strSprite_Brique, x, y);.
+
+                objImage.pixelX1 = x*(objCanvas.width/intNum_Cell_X);
+                objImage.pixelY1 = y*(objCanvas.height/intNum_Cell_Y);
+
+                objImage.pixelX2 = objImage.getPixelX1() + intPixelWidthBrique;
+                objImage.pixelY2 = objImage.getPixelY1() + intPixelHeightBrique;
+
+                objBrick.pixelX1 = objImage.getPixelX1();
+                objBrick.pixelY1 = objImage.getPixelY1();
+
+                //objBrickCollision.children.push(objBrick);
+
+                break;
+              case "2":
+                objImage.strCharactere = "#";
+                objImage.strSrc = strSprite_Brique;
+                //objImage.img = initImage(strSprite_Brique, x, y);
+
+                objImage.pixelX1 = x*(objCanvas.width/intNum_Cell_X);
+                objImage.pixelY1 = y*(objCanvas.height/intNum_Cell_Y);
+
+                objImage.pixelX2 = objImage.getPixelX1() + intPixelWidthBrique;
+                objImage.pixelY2 = objImage.getPixelY1() + intPixelHeightBrique;
+
+                objBrick.pixelX2 = objImage.getPixelX2();
+                objBrick.pixelY2 = objImage.getPixelY2();
+
+                objBrickCollision.children.push(objBrick);
+
+                break;
               case "~": 
                 objImage.strSrc = strSprite_Sol;
                 //objImage.img = initImage(strSprite_Sol, x, y);
@@ -288,9 +340,17 @@
         
         objStage.draw();
 
+        /*objMap.forEach(strCharactere => {
+          console.log(strCharactere);
+        });*/
+
+        //console.log(objMap[17][14].strCharactere);
+
         //objStage.getConsoleImageIndexAt("H");
         //console.log(objStage.getChildFromCharacterePositionAt("$", 17, 14));
         //console.log(objStage.collision(objJoueur.objImage, objStage.getChildFromCharacterePositionAt("$", 17, 14)));
+
+        console.log(objBrickCollision.children[objBrickCollision.children.length-1].strCharactere);
 
         animer();
       }
@@ -309,11 +369,12 @@
         objStage.draw();
         //objStage.getConsoleImageIndexAt("@");
 
-        objStage.getChildCharactereAt("$").forEach(objImage => {
-          if (objStage.collision(objJoueur.objImage, objImage)) {
+        objStage.getChildCharactereAt("$").forEach(objImageGold => {
+          if (objStage.collision(objJoueur.objImage, objImageGold)) {
             //objImage.visible = false; // pour les gardes
-            objStage.removeChild(objImage); // pour lode runner
+            objStage.removeChild(objImageGold); // pour lode runner
             intOr_Count--;
+            intScore += 250;
           }
         });
 
@@ -330,15 +391,27 @@
           }); 
         }
 
+        /*console.log(objStage.getCharacterePositionAt(objJoueur.objImage.getX()-1, objJoueur.objImage.getY())  + "x gauche, " +
+                    objStage.getCharacterePositionAt(objJoueur.objImage.getX()+1, objJoueur.objImage.getY()) + "x droite, " + 
+                    objJoueur.objImage.getX() + "x, " + objJoueur.objImage.getY() + "y");*/
+
+        //console.log(objStage.getCharacterePositionAt(objJoueur.objImage.getX(), objJoueur.objImage.getY()));
+        //console.log(objJoueur.objImage.getX() + "x, " + objJoueur.objImage.getY() + "y");
+        //console.log(objMap[objJoueur.objImage.getX()][objJoueur.objImage.getY()].strCharactere);
+
         //objJoueur.fall();
 
-        /*objStage.showHitBoxes(objJoueur.objImage, "white");
-        objStage.getChildCharactereAt("H").forEach(objImage => {
+        objStage.showHitBoxes(objJoueur.objImage, "white");
+        /*objStage.getChildCharactereAt("H").forEach(objImage => {
           objStage.showHitBoxes(objImage, "yellow");
         });
         objStage.getChildCharactereAt("#").forEach(objImage => {
           objStage.showHitBoxes(objImage, "red");
         });*/
+        objBrickCollision.children.forEach(objBrick => {
+          objStage.showHitBoxes(objBrick, "red");
+          //console.log(objBrick.getPixelX1() + "x1, " + objBrick.getPixelY1() + "y1, " + objBrick.getPixelX2() + "x2, " + objBrick.getPixelY2() + "y2");
+        });
 
         /*console.log("\"" + objStage.getCharacterePositionAt(objJoueur.objImage.getX()+1, objJoueur.objImage.getY()) + "\"" + " : " +
                     objJoueur.objImage.getX() + "x, " + objJoueur.objImage.getY() + "y");*/
@@ -872,31 +945,23 @@
             }
           });
 
-          /*var objDateFinale = new Date().getTime();
+          var objDateFinale = new Date().getTime();
 
           var timeDiff = objDateFinale - objDateInitiale; 
           
-          var secDiff = objDateFinale.getSeconds() - objDateInitiale.getSeconds();
-          var minDiff = objDateFinale.getMinutes() - objDateInitiale.getMinutes();
-          /*d.setSeconds((secDiff/1000)%60);
-          d.setMinutes((secDiff/60000)%60);*/
-
-          //console.log(secDiff);
-         
-        
-          /*var str = "" + intScore;
+          var secDiff = Math.floor((timeDiff % (1000 * 60)) / 1000); 
+          var minDiff = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+                 
+          var str = "" + intScore;
           var pad = "0000000";
 
           var strScore = pad.substring(0, pad.length - str.length) + str;
-          //var minDiff = (secDiff/1000) % 60; //d.getMinutes.toString();
-          //minDiff = pad.substring(0, 2-minDiff.length) + minDiff;
-          //var secDiffs=d.getSeconds;
 
-          var text="SCORE: " + strScore + "    TEMPS: " + ('0'+minDiff).slice(-2) + ":" + ('0'+secDiff).slice(-2) + "    NIVEAU: " + intNiveau_Courant + "    VIES: 1";
+          var text="SCORE: " + strScore + "\t\t\t\tTEMPS: " + ('0'+minDiff).slice(-2) + ":" + ('0'+secDiff).slice(-2) + "\t\t\t\tNIVEAU: " + intNiveau_Courant + "\t\t\t\tVIES: " + intVies;
 
           objC2D.fillStyle="white";
           objC2D.font = '35pt Verdana';
-          objC2D.fillText(text, 40, 1070); */
+          objC2D.fillText(text, 40, 1070);
         };
 
         // !!! NE PAS UTILISER. LE CODE NE MARCHE PAS. UTILISER blackCanvas() AVEC objStage.draw() !!!
@@ -1128,7 +1193,9 @@
 
         object_Joueur.moveUp = function() {
           objStage.getChildCharactereAt("H").forEach(objImage => {
-            if (this.objImage.getPixelY1() >= 0 && objStage.collision(this.objImage, objImage)) {
+            if (this.objImage.getPixelY1() >= 0 && 
+                objStage.collision(this.objImage, objImage) &&
+                objMap[this.objImage.getX()][this.objImage.getY()].strCharactere == "H") {
               this.intOptions++;
               this.intOptions = this.intOptions % 8;
               
@@ -1152,7 +1219,9 @@
           });
 
           objStage.getChildCharactereAt("|").forEach(objImage => {
-            if (this.objImage.getPixelY1() >= 0 && objStage.collision(this.objImage, objImage)) {
+            if (this.objImage.getPixelY1() >= 0 && 
+                objStage.collision(this.objImage, objImage) &&
+                objMap[this.objImage.getX()][this.objImage.getY()].strCharactere == "|") {
               this.intOptions++;
               this.intOptions = this.intOptions % 8;
               
@@ -1203,6 +1272,7 @@
             objStage.getChildCharactereAt("H").forEach(objImage => {
               if (this.objImage.getPixelY2() < objCanvas.height && 
                   objStage.collision(this.objImage, objImage, 5) && 
+                  objMap[this.objImage.getX()][this.objImage.getY()].strCharactere == "H" &&
                     ((objStage.getCharacterePositionAt(this.objImage.getX(), this.objImage.getY()+1) != "#" && objStage.getCharacterePositionAt(this.objImage.getX(), this.objImage.getY()+1) != " ") ||
                     (objStage.getCharacterePositionAt(this.objImage.getX(), this.objImage.getY()+1) == "#" && !objStage.collision(this.objImage, objStage.getChildFromCharacterePositionAt("#", this.objImage.getX(), this.objImage.getY()+1))))) {
                   this.intOptions++;
@@ -1230,6 +1300,7 @@
             objStage.getChildCharactereAt("|").forEach(objImage => {
               if (this.objImage.getPixelY2() < objCanvas.height && 
                   objStage.collision(this.objImage, objImage, 2) && 
+                  objMap[this.objImage.getX()][this.objImage.getY()].strCharactere == "|" &&
                     ((objStage.getCharacterePositionAt(this.objImage.getX(), this.objImage.getY()+1) != "#" && objStage.getCharacterePositionAt(this.objImage.getX(), this.objImage.getY()+1) != " ") ||
                     (objStage.getCharacterePositionAt(this.objImage.getX(), this.objImage.getY()+1) == "#" && !objStage.collision(this.objImage, objStage.getChildFromCharacterePositionAt("#", this.objImage.getX(), this.objImage.getY()+1))))) {
                 this.intOptions++;
@@ -1257,40 +1328,72 @@
         };
 
         object_Joueur.fall = function() {
-          if (this.action == "@" && 
-              (objStage.getCharacterePositionAt(this.objImage.getX(), this.objImage.getY()+1) == " " ||
-                  (objStage.getCharacterePositionAt(this.objImage.getX(), this.objImage.getY()+1) == "#" && 
-                  !objStage.collision(this.objImage, objStage.getChildFromCharacterePositionAt("#", this.objImage.getX(), this.objImage.getY()+1))))) {
-            this.intOptions++;
+          /*console.log((this.action == "@") + "\n" + 
+                      (objMap[this.objImage.getX()][this.objImage.getY()+1].strCharactere == " ") + "\n" + 
+                      ((objMap[this.objImage.getX()][this.objImage.getY()+1].strCharactere == "#" && 
+                        !objStage.collision(this.objImage, objStage.getChildFromCharacterePositionAt("#", this.objImage.getX(), this.objImage.getY()+1)))) + "\n" +
+                      ((objMap[this.objImage.getX()][this.objImage.getY()+1].strCharactere == "~" && 
+                        !objStage.collision(this.objImage, objStage.getChildFromCharacterePositionAt("~", this.objImage.getX(), this.objImage.getY()+1)))));*/
 
-            if (this.binGauche) {
-              this.intOptions = 17;
+            /*console.log(//(objMap[this.objImage.getX()][this.objImage.getY()+1].strCharactere == "#" && 
+                        !(objStage.collision(this.objImage, objStage.getChildFromCharacterePositionAt("#", this.objImage.getX(), this.objImage.getY()+1), 20)));*/
+
+          objBrickCollision.children.forEach(objBrick => {
+            console.log(objStage.collision(this.objImage, objBrick));
+
+            if (this.action == "@" && 
+                ((objMap[this.objImage.getX()][this.objImage.getY()+1].strCharactere == " ") ||
+                    (objMap[this.objImage.getX()][this.objImage.getY()+1].strCharactere == "#" && 
+                    !objStage.collision(this.objImage, objBrick /*objStage.getChildFromCharacterePositionAt("#", this.objImage.getX(), this.objImage.getY()+1)*/)) /*|| 
+
+                    (objMap[this.objImage.getX()][this.objImage.getY()+1].strCharactere == "~" && 
+                    !objStage.collision(this.objImage, objStage.getChildFromCharacterePositionAt("~", this.objImage.getX(), this.objImage.getY()+1), 2))*/)) {
+              this.intOptions++;
+
+              if (this.binGauche) {
+                this.intOptions = 17;
+              }
+              else {
+                this.intOptions = 8;
+              }
+
+              this.objImage.pixelY1 += 5;
+
+              this.objImage.pixelY2 = this.objImage.getPixelY1() + intPixelHeightRunner;
+
+              this.objImage.intY = Math.floor(this.objImage.getPixelY1()*intNum_Cell_Y/objCanvas.height);
             }
-            else {
-              this.intOptions = 8;
-            }
-
-            this.objImage.pixelY1 += 5;
-
-            this.objImage.pixelY2 = this.objImage.getPixelY1() + intPixelHeightRunner;
-
-            this.objImage.intY = Math.floor(this.objImage.getPixelY1()*intNum_Cell_Y/objCanvas.height);
-          }
+          });
         };
 
         object_Joueur.removeBrick = function() {
           if (this.binGauche) {
             this.intOptions=16;
+            //console.log(objStage.getCharacterePositionAt(this.objImage.getX()-1, this.objImage.getY()+1) + ", " + this.objImage.getX() + "x, " + this.objImage.getY() + "y");
+
+            if (objStage.getCharacterePositionAt(this.objImage.getX()-1, this.objImage.getY()+1) == "#" &&
+                (objStage.getCharacterePositionAt(this.objImage.getX()-1, this.objImage.getY()) == " " || typeof objStage.getCharacterePositionAt(this.objImage.getX()-1, this.objImage.getY()) == "undefined")) {
+              objStage.getChildFromCharacterePositionAt("#", this.objImage.getX()-1, this.objImage.getY()+1).visible = false;
+            }
           }
           else{
             this.intOptions=15;
+            //console.log(objStage.getCharacterePositionAt(this.objImage.getX()+1, this.objImage.getY()+1) + ", " + this.objImage.getX() + "x, " + this.objImage.getY() + "y");
+
+            if (objStage.getCharacterePositionAt(this.objImage.getX()+1, this.objImage.getY()+1) == "#" &&
+                (objStage.getCharacterePositionAt(this.objImage.getX()+1, this.objImage.getY()) == " " || typeof objStage.getCharacterePositionAt(this.objImage.getX()+1, this.objImage.getY()) == "undefined")) {
+              objStage.getChildFromCharacterePositionAt("#", this.objImage.getX()+1, this.objImage.getY()+1).visible = false;
+
+            }
           }
         };
         object_Joueur.removeRight = function() {
-
+          console.log("Remove right");
+          this.intOptions=15;
         };
         object_Joueur.removeLeft = function() {
-
+          console.log("Remove left");
+          this.intOptions=16;
         };
 
         return object_Joueur;
@@ -1397,6 +1500,56 @@
         return object_Images;
       }
 
+      function object_BrickCollision() {
+        var object_BrickCollision = {};
+
+        object_BrickCollision.children = [];
+
+        object_BrickCollision.addChild = function(child) {
+          if (child == null) { return child; }
+          var l = arguments.length;
+          if (l > 1) {
+            for (var i=0; i<l; i++) { this.addChild(arguments[i]); }
+            return arguments[l-1];
+          }
+          // Note: a lot of duplication with addChildAt, but push is WAY faster than splice.
+          var par=child.parent, silent = par === this;
+          par&&par._removeChildAt(this.indexOf(par.children, child), silent);
+          child.parent = this;
+          this.children.push(child);
+          //if (!silent) { child.dispatchEvent("added"); }
+          return child;
+        }
+
+        return object_BrickCollision;
+      }
+
+      function object_brick() {
+        var object_brick = {};
+
+        object_brick.strCharactere = null;
+
+        object_brick.pixelX1 = null;
+        object_brick.pixelY1 = null;
+        object_brick.pixelX2 = null;
+        object_brick.pixelY2 = null;
+
+        object_brick.getPixelX1 = function() {
+          return this.pixelX1;
+        };
+        object_brick.getPixelY1 = function() {
+          return this.pixelY1;
+        };
+        object_brick.getPixelX2 = function() {
+          return this.pixelX2;
+        };
+        object_brick.getPixelY2 = function() {
+          return this.pixelY2;
+        };
+
+        return object_brick;
+      }
+
       function deplacerJoueur() {
         switch (event.keyCode) {
           case 39: // Flèche-à-droite
@@ -1433,6 +1586,12 @@
           case 32: // Espace
             objJoueur.removeBrick();
 
+            break;
+          case 88: // x
+            objJoueur.removeRight();
+            break;
+          case 90: // z
+            objJoueur.removeLeft();
             break;
         }
       }
