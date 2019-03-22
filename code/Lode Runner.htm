@@ -13,13 +13,13 @@
       const intNum_Cell_X = 28, intNum_Cell_Y = 17;
 
       const intPixelWidthOr = 35, intPixelHeightOr = 42;
-      const intPixelWidthRunner = 50, intPixelHeightRunner = 60;
+      const intPixelWidthRunner = 50, intPixelHeightRunner = 65;
       const intPixelWidthGarde = 50, intPixelHeightGarde = 66;
       const intPixelWidthEscalier = 50, intPixelHeightEscalier = 66;
       const intPixelWidthCorde = 50, intPixelHeightCorde = 66;
       const intPixelWidthBrique = 50, intPixelHeightBrique = 65;
 
-      const intVitesseRunner = 5, intVitesseGarde = 5;
+      const intVitesseRunner = 10, intVitesseGarde = 5;
 
       /* legende de la carte du niveau : 
           $ = or
@@ -36,18 +36,18 @@
       const arrNiveau_Map = [ 
         "                  |         " + // carte du niveau 1
         "    $             |         " +
-        "1#####2H1#####2   |         " +
-        "       H----------|    $    " +
-        "       H    12H   1#####2H12" +
-        "       H    12H          H  " +
-        "     ! H    12H       $! H  " +
-        "12H1###2    1######2H1#####2" +
+        "#######H#######   |         " +
+        "       H3--------4|    $    " +
+        "       H    ##H   #######H##" +
+        "       H    ##H          H  " +
+        "     ! H    ##H       $! H  " +
+        "##H#####    ########H#######" +
         "  H                 H       " +
         "  H           !     H       " +
-        "1#######2H1########2H       " +
+        "#########H##########H       " +
         "         H          H       " +
-        "       $ H----------H   $   " +
-        "    H1####2         1#####2H" +
+        "       $ H3--------4H   $   " +
+        "    H######         1#####2H" +
         "    H         @  $         H" +
         "1##########################2" + 
         "~~~~~~~~~~~~~~~~~~~~~~~~~~~~" 
@@ -80,7 +80,11 @@
       var objDateInitiale = new Date().getTime();
       var intVies = 5;
 
-      var objBrickCollision = null;
+      var blnCordeFall = false;
+
+      //var objBrickCollision = null;
+
+      var arrBrick = [], arrCorde = [];
 
 
       // remettre les variables globales aux valeurs par defaut
@@ -96,7 +100,7 @@
         // redefini la fonction joueur et le met dans la variable objJoueur
         objJoueur = object_Joueur({});
 
-        objBrickCollision = object_BrickCollision({});
+        //objBrickCollision = object_BrickCollision({});
 
         objMap = [[]];
 
@@ -119,7 +123,7 @@
             objMap[x][y] = {};
         }
 
-        var objBrick;
+        var objBrick, objCorde;
 
         // parcours les cellules horizontales
         for (var y = 0; y < intNum_Cell_Y; y++) { 
@@ -235,6 +239,49 @@
                 objImage.pixelY2 = objImage.getPixelY1() + intPixelHeightCorde;
 
                 break;
+              case "3":
+                //objBrick = object_brick({});
+
+                objCorde = object_brick({});
+
+                objMap[x][y].strCharactere = "-";
+
+                objImage.strCharactere = "-";
+                objImage.strSrc = strSprite_Corde;
+                //objImage.img = initImage(strSprite_Brique, x, y);.
+
+                objImage.pixelX1 = x*(objCanvas.width/intNum_Cell_X);
+                objImage.pixelY1 = y*(objCanvas.height/intNum_Cell_Y);
+
+                objImage.pixelX2 = objImage.getPixelX1() + intPixelWidthCorde;
+                objImage.pixelY2 = objImage.getPixelY1() + intPixelHeightCorde;
+
+                objCorde.pixelX1 = objImage.getPixelX1();
+                objCorde.pixelY1 = objImage.getPixelY1();
+
+                //objBrickCollision.children.push(objBrick);
+
+                break;
+              case "4":
+                objMap[x][y].strCharactere = "-";
+
+                objImage.strCharactere = objCorde.strCharactere = "-";
+                objImage.strSrc = strSprite_Corde;
+                //objImage.img = initImage(strSprite_Brique, x, y);
+
+                objImage.pixelX1 = x*(objCanvas.width/intNum_Cell_X);
+                objImage.pixelY1 = y*(objCanvas.height/intNum_Cell_Y);
+
+                objImage.pixelX2 = objImage.getPixelX1() + intPixelWidthCorde;
+                objImage.pixelY2 = objImage.getPixelY1() + intPixelHeightCorde;
+
+                objCorde.pixelX2 = objImage.getPixelX2();
+                objCorde.pixelY2 = objImage.getPixelY2();
+
+                  //objBrickCollision.children.push(objBrick);
+                arrCorde.push(objCorde);
+
+                break;
               case "#":
                 objImage.strSrc = strSprite_Brique;
                 //objImage.img = initImage(strSprite_Brique, x, y);
@@ -249,6 +296,8 @@
 
               case "1":
                 objBrick = object_brick({});
+
+                objMap[x][y].strCharactere = "#";
 
                 objImage.strCharactere = "#";
                 objImage.strSrc = strSprite_Brique;
@@ -267,7 +316,9 @@
 
                 break;
               case "2":
-                objImage.strCharactere = "#";
+                objMap[x][y].strCharactere = "#";
+
+                objImage.strCharactere = objBrick.strCharactere = "#";
                 objImage.strSrc = strSprite_Brique;
                 //objImage.img = initImage(strSprite_Brique, x, y);
 
@@ -280,7 +331,11 @@
                 objBrick.pixelX2 = objImage.getPixelX2();
                 objBrick.pixelY2 = objImage.getPixelY2();
 
-                objBrickCollision.children.push(objBrick);
+                objBrick.intY = y;
+
+                //objBrickCollision.children.push(objBrick);
+
+                arrBrick.push(objBrick);
 
                 break;
               case "~": 
@@ -350,7 +405,10 @@
         //console.log(objStage.getChildFromCharacterePositionAt("$", 17, 14));
         //console.log(objStage.collision(objJoueur.objImage, objStage.getChildFromCharacterePositionAt("$", 17, 14)));
 
-        console.log(objBrickCollision.children[objBrickCollision.children.length-1].strCharactere);
+        //console.log(objBrickCollision.children[objBrickCollision.children.length-1].getPixelY2());
+
+        //console.log(objBrickCollision.children[15].getPixelY2());
+        //console.log(objJoueur.objImage.getPixelY2());
 
         animer();
       }
@@ -391,6 +449,10 @@
           }); 
         }
 
+        //console.log(objStage.collision(objJoueur.objImage, objBrickCollision.children[15]));
+
+        //console.log(objJoueur.objImage.getPixelY1() + "y1, " + objJoueur.objImage.getPixelY2() + "y2");
+
         /*console.log(objStage.getCharacterePositionAt(objJoueur.objImage.getX()-1, objJoueur.objImage.getY())  + "x gauche, " +
                     objStage.getCharacterePositionAt(objJoueur.objImage.getX()+1, objJoueur.objImage.getY()) + "x droite, " + 
                     objJoueur.objImage.getX() + "x, " + objJoueur.objImage.getY() + "y");*/
@@ -399,19 +461,37 @@
         //console.log(objJoueur.objImage.getX() + "x, " + objJoueur.objImage.getY() + "y");
         //console.log(objMap[objJoueur.objImage.getX()][objJoueur.objImage.getY()].strCharactere);
 
-        //objJoueur.fall();
+        objStage.getChildCharactereAt("!").forEach(objImage => {
+          if (objJoueur.objImage.getX() == objImage.getX() && 
+              objJoueur.objImage.getY() == objImage.getY() && 
+              objStage.collision(objJoueur.objImage, objImage)) {
+            intVies--;
 
-        objStage.showHitBoxes(objJoueur.objImage, "white");
+            arreterAnimation();
+          }
+        }); 
+
+        objJoueur.fall();
+
+        //console.log(objMap[objJoueur.objImage.getX()][objJoueur.objImage.getY()].strCharactere);
+
+        //objStage.showHitBoxes(objJoueur.objImage, "white");
+        /*arrCorde.forEach(objImage => {
+          objStage.showHitBoxes(objImage, "red");
+        });*/
+        /*arrBrick.forEach(objImage => {
+          objStage.showHitBoxes(objImage, "red");
+        });*/
         /*objStage.getChildCharactereAt("H").forEach(objImage => {
           objStage.showHitBoxes(objImage, "yellow");
         });
         objStage.getChildCharactereAt("#").forEach(objImage => {
           objStage.showHitBoxes(objImage, "red");
         });*/
-        objBrickCollision.children.forEach(objBrick => {
+        /*objBrickCollision.children.forEach(objBrick => {
           objStage.showHitBoxes(objBrick, "red");
           //console.log(objBrick.getPixelX1() + "x1, " + objBrick.getPixelY1() + "y1, " + objBrick.getPixelX2() + "x2, " + objBrick.getPixelY2() + "y2");
-        });
+        });*/
 
         /*console.log("\"" + objStage.getCharacterePositionAt(objJoueur.objImage.getX()+1, objJoueur.objImage.getY()) + "\"" + " : " +
                     objJoueur.objImage.getX() + "x, " + objJoueur.objImage.getY() + "y");*/
@@ -1049,7 +1129,7 @@
 
         object_Joueur.intOptions = 0;
 
-        object_Joueur.action = "@";
+        object_Joueur.action = "H";
 
         /*object_Joueur.intPositionX1 = 0; //800;
         object_Joueur.intPositionY1 = 0; //900;
@@ -1140,11 +1220,19 @@
 
                 this.action = "@";
               }
+            }); 
+
+              /*arrCorde.forEach(objCorde => {
+                if (objStage.getCharacterePositionAt(this.objImage.getX()+1, this.objImage.getY()) == "-" &&
+                    !objStage.collision(this.objImage, arrCorde.forEach(objCorde => {return objCorde}))) {
+
+                }
+              });
 
               return;
-            });
+            });*/
             
-            this.objImage.pixelX1 += 5;
+            this.objImage.pixelX1 += intVitesseRunner;
 
             this.objImage.pixelX2 = this.objImage.getPixelX1() + intPixelWidthRunner;
 
@@ -1183,7 +1271,7 @@
               return;
             });
             
-            this.objImage.pixelX1 -= 5;
+            this.objImage.pixelX1 -= intVitesseRunner;
 
             this.objImage.pixelX2 = this.objImage.getPixelX1() + intPixelWidthRunner;
 
@@ -1203,7 +1291,7 @@
                 this.intOptions =+ 6;
               }
 
-              this.objImage.pixelY1 -= 5;
+              this.objImage.pixelY1 -= intVitesseRunner;
 
               this.objImage.pixelY2 = this.objImage.getPixelY1() + intPixelHeightRunner;
 
@@ -1229,7 +1317,7 @@
                 this.intOptions =+ 6;
               }
 
-              this.objImage.pixelY1 -= 5;
+              this.objImage.pixelY1 -= intVitesseRunner;
 
               this.objImage.pixelY2 = this.objImage.getPixelY1() + intPixelHeightRunner;
 
@@ -1248,11 +1336,26 @@
           /*var blnSurLaCorde = false;
 
           objStage.getChildCharactereAt("-").forEach(objImageCorde => {
+              if (objStage.getCharacterePositionAt(this.objImage.getX()-1, this.objImage.getY()) == "-" &&
+                  objStage.collision(this.objImage, objStage.getChildFromCharacterePositionAt("-", this.objImage.getX()-1, this.objImage.getY()))) {
+                this.intOptions = this.intOptions % 15;
+                blnSurLaCorde = true;
+
+                return;
+              }
+
+              if (objStage.getCharacterePositionAt(this.objImage.getX()+1, this.objImage.getY()) == "-" &&
+                  objStage.collision(this.objImage, objStage.getChildFromCharacterePositionAt("-", this.objImage.getX()+1, this.objImage.getY()))) {
+                blnSurLaCorde = true;
+
+                return;
+              }
+            });*/
+
+          /*objStage.getChildCharactereAt("-").forEach(objImageCorde => {
             if (objStage.getCharacterePositionAt(this.objImage.getX()+1, this.objImage.getY()) == "-" &&
                   objStage.collision(this.objImage, objStage.getChildFromCharacterePositionAt("-", this.objImage.getX()+1, this.objImage.getY()))) {
-              blnSurLaCorde = true;
-
-              return;
+              
             }
 
             if (objStage.getCharacterePositionAt(this.objImage.getX()-1, this.objImage.getY()) == "-" &&
@@ -1261,18 +1364,22 @@
 
               return;
             }
-          });
+          });*/
 
-          if (blnSurLaCorde) {
+          /*if (blnSurLaCorde) {
             this.action = "@";
+
+            blnCordeFall = true;
 
             this.fall();
           }
-          else {*/
+          else {
+            blnCordeFall = false;*/
+
             objStage.getChildCharactereAt("H").forEach(objImage => {
               if (this.objImage.getPixelY2() < objCanvas.height && 
-                  objStage.collision(this.objImage, objImage, 5) && 
-                  objMap[this.objImage.getX()][this.objImage.getY()].strCharactere == "H" &&
+                  objStage.collision(this.objImage, objImage, 4) && 
+                  (objMap[this.objImage.getX()][this.objImage.getY()+1].strCharactere == "H" || objMap[this.objImage.getX()][this.objImage.getY()].strCharactere == "H") &&
                     ((objStage.getCharacterePositionAt(this.objImage.getX(), this.objImage.getY()+1) != "#" && objStage.getCharacterePositionAt(this.objImage.getX(), this.objImage.getY()+1) != " ") ||
                     (objStage.getCharacterePositionAt(this.objImage.getX(), this.objImage.getY()+1) == "#" && !objStage.collision(this.objImage, objStage.getChildFromCharacterePositionAt("#", this.objImage.getX(), this.objImage.getY()+1))))) {
                   this.intOptions++;
@@ -1282,7 +1389,7 @@
                     this.intOptions =+ 6;
                   }
 
-                  this.objImage.pixelY1 += 5;
+                  this.objImage.pixelY1 += intVitesseRunner;
 
                   this.objImage.pixelY2 = this.objImage.getPixelY1() + intPixelHeightRunner;
 
@@ -1299,8 +1406,8 @@
 
             objStage.getChildCharactereAt("|").forEach(objImage => {
               if (this.objImage.getPixelY2() < objCanvas.height && 
-                  objStage.collision(this.objImage, objImage, 2) && 
-                  objMap[this.objImage.getX()][this.objImage.getY()].strCharactere == "|" &&
+                  objStage.collision(this.objImage, objImage, 4) && 
+                  (objMap[this.objImage.getX()][this.objImage.getY()+1].strCharactere == "|" || objMap[this.objImage.getX()][this.objImage.getY()].strCharactere == "|") &&
                     ((objStage.getCharacterePositionAt(this.objImage.getX(), this.objImage.getY()+1) != "#" && objStage.getCharacterePositionAt(this.objImage.getX(), this.objImage.getY()+1) != " ") ||
                     (objStage.getCharacterePositionAt(this.objImage.getX(), this.objImage.getY()+1) == "#" && !objStage.collision(this.objImage, objStage.getChildFromCharacterePositionAt("#", this.objImage.getX(), this.objImage.getY()+1))))) {
                 this.intOptions++;
@@ -1310,7 +1417,7 @@
                   this.intOptions =+ 6;
                 }
 
-                this.objImage.pixelY1 += 5;
+                this.objImage.pixelY1 += intVitesseRunner;
 
                 this.objImage.pixelY2 = this.objImage.getPixelY1() + intPixelHeightRunner;
 
@@ -1338,16 +1445,40 @@
             /*console.log(//(objMap[this.objImage.getX()][this.objImage.getY()+1].strCharactere == "#" && 
                         !(objStage.collision(this.objImage, objStage.getChildFromCharacterePositionAt("#", this.objImage.getX(), this.objImage.getY()+1), 20)));*/
 
-          objBrickCollision.children.forEach(objBrick => {
-            console.log(objStage.collision(this.objImage, objBrick));
+            //console.log(this.objImage.getY()+1);
+            /*arrBrick.forEach(objBrick => {
+              if (this.objImage.getY()+1 == objBrick.intY) {
+                console.log("Oui");
+              }
+            });*/
+
+          //arrBrick.forEach(objBrick => {
+            //console.log(objStage.collision(this.objImage, objBrick));
+
+            //console.log(objStage.collision(this.objImage, objBrick) == false);
+
+            /*if (objBrick.intY == this.objImage.getY()+1) {
+              console.log("Oui");
+            }
+            else {
+              console.log("Non");
+            }*/
+
+            //console.log(objMap[this.objImage.getX()][this.objImage.getY()+1].strCharactere == " ");
+            //console.log(objMap[this.objImage.getX()+1][this.objImage.getY()].strCharactere != "-" || objMap[this.objImage.getX()-1][this.objImage.getY()].strCharactere != "-");
 
             if (this.action == "@" && 
-                ((objMap[this.objImage.getX()][this.objImage.getY()+1].strCharactere == " ") ||
-                    (objMap[this.objImage.getX()][this.objImage.getY()+1].strCharactere == "#" && 
-                    !objStage.collision(this.objImage, objBrick /*objStage.getChildFromCharacterePositionAt("#", this.objImage.getX(), this.objImage.getY()+1)*/)) /*|| 
+
+                (objMap[this.objImage.getX()+1][this.objImage.getY()].strCharactere != "-" || objMap[this.objImage.getX()-1][this.objImage.getY()].strCharactere != "-") &&
+
+                (objMap[this.objImage.getX()][this.objImage.getY()+1].strCharactere == " " || objMap[this.objImage.getX()][this.objImage.getY()-1].strCharactere == "-" ||
+
+                    (objStage.getCharacterePositionAt(this.objImage.getX(), this.objImage.getY()+1) == "#" && 
+
+                    !objStage.collision(this.objImage, arrBrick.forEach(objBrick => {return objBrick}) /*objBrick*/)) || 
 
                     (objMap[this.objImage.getX()][this.objImage.getY()+1].strCharactere == "~" && 
-                    !objStage.collision(this.objImage, objStage.getChildFromCharacterePositionAt("~", this.objImage.getX(), this.objImage.getY()+1), 2))*/)) {
+                    !objStage.collision(this.objImage, objStage.getChildCharactereAt("~").forEach(objBrick => {return objBrick}))))) {
               this.intOptions++;
 
               if (this.binGauche) {
@@ -1357,16 +1488,20 @@
                 this.intOptions = 8;
               }
 
-              this.objImage.pixelY1 += 5;
+              this.objImage.pixelY1 += intVitesseRunner;
 
               this.objImage.pixelY2 = this.objImage.getPixelY1() + intPixelHeightRunner;
 
               this.objImage.intY = Math.floor(this.objImage.getPixelY1()*intNum_Cell_Y/objCanvas.height);
+
+              //return;
             }
-          });
+          //});
         };
 
         object_Joueur.removeBrick = function() {
+          this.action = "@";
+
           if (this.binGauche) {
             this.intOptions=16;
             //console.log(objStage.getCharacterePositionAt(this.objImage.getX()-1, this.objImage.getY()+1) + ", " + this.objImage.getX() + "x, " + this.objImage.getY() + "y");
@@ -1374,6 +1509,8 @@
             if (objStage.getCharacterePositionAt(this.objImage.getX()-1, this.objImage.getY()+1) == "#" &&
                 (objStage.getCharacterePositionAt(this.objImage.getX()-1, this.objImage.getY()) == " " || typeof objStage.getCharacterePositionAt(this.objImage.getX()-1, this.objImage.getY()) == "undefined")) {
               objStage.getChildFromCharacterePositionAt("#", this.objImage.getX()-1, this.objImage.getY()+1).visible = false;
+              //objStage.removeChild(objStage.getChildFromCharacterePositionAt("#", this.objImage.getX()-1, this.objImage.getY()+1));
+              objMap[this.objImage.getX()-1][this.objImage.getY()+1].strCharactere = " ";
             }
           }
           else{
@@ -1383,6 +1520,8 @@
             if (objStage.getCharacterePositionAt(this.objImage.getX()+1, this.objImage.getY()+1) == "#" &&
                 (objStage.getCharacterePositionAt(this.objImage.getX()+1, this.objImage.getY()) == " " || typeof objStage.getCharacterePositionAt(this.objImage.getX()+1, this.objImage.getY()) == "undefined")) {
               objStage.getChildFromCharacterePositionAt("#", this.objImage.getX()+1, this.objImage.getY()+1).visible = false;
+              //objStage.removeChild(objStage.getChildFromCharacterePositionAt("#", this.objImage.getX()+1, this.objImage.getY()+1));
+              objMap[this.objImage.getX()+1][this.objImage.getY()+1].strCharactere = " ";
 
             }
           }
@@ -1500,7 +1639,7 @@
         return object_Images;
       }
 
-      function object_BrickCollision() {
+      /*function object_BrickCollision() {
         var object_BrickCollision = {};
 
         object_BrickCollision.children = [];
@@ -1522,12 +1661,14 @@
         }
 
         return object_BrickCollision;
-      }
+      }*/
 
       function object_brick() {
         var object_brick = {};
 
         object_brick.strCharactere = null;
+
+        object_brick.intY = null;
 
         object_brick.pixelX1 = null;
         object_brick.pixelY1 = null;
